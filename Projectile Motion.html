@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拋體運動 (Projectile Motion )</title>
+<style>
+  body { font-family:"Microsoft JhengHei",sans-serif; margin:0; padding:0; background:#f7f9fc; color:#333; line-height:1.8; }
+  header { background:#2c3e50; color:white; text-align:center; padding:20px 10px; }
+  h1 { margin:0; font-size:50px; }
+  section { max-width:900px; margin:20px auto; background:white; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.1); padding:25px 35px; }
+  h2 { font-size:35px;color:#1a5276; border-left:6px solid #1a5276; padding-left:10px; margin-top:20px; margin-bottom:20px; }
+  canvas { border:2px solid #333; background:#fff; display:block; margin:20px auto; }
+  .control { text-align:center; margin-top:20px; }
+  input, button { font-size:16px; padding:5px 8px; margin:5px; }
+  button { background:#1a5276; color:white; border:none; cursor:pointer; border-radius:4px; }
+  button:hover { background:#2471a3; }
+  p{font-size: 20px;}
+  #info p {font-size: 25px;     margin: 5px;}
+  label{font-size: 25px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>拋體運動（Projectile Motion）</h1>
+</header>
+
+<section>
+  <h2>定律內容</h2>
+  <p>拋體運動是物體以初速度 v₀ 與水平面成角 θ 被拋出後，只受重力影響的運動。水平方向勻速，垂直方向受重力影響，形成拋物線軌跡。</p>
+
+  <h2>公式表示</h2>
+  <p>
+    水平速度：vₓ = v₀ cosθ<br>
+    垂直速度：vᵧ = v₀ sinθ - g t<br>
+    位移：x = v₀ cosθ · t，y = v₀ sinθ · t - ½ g t²<br>
+    最大高度：hₘₐₓ = (v₀² sin²θ)/(2g)<br>
+    飛行時間：T = (2v₀ sinθ)/g<br>
+    水平射程：R = (v₀² sin(2θ))/g
+  </p>
+
+  <h2>圖像理解</h2>
+  <p>軌跡是一條對稱的拋物線。物體先上升至最高點，速度垂直分量為0，再下降至地面。忽略空氣阻力時，形狀由初速度與角度決定。</p>
+
+  <h2>適用範圍</h2>
+  <p>適用於忽略空氣阻力、重力加速度恆定的情況。不適用於高速或高空拋射，因為空氣阻力與重力變化不可忽略。</p>
+
+  <h2>常見應用</h2>
+  <p>廣泛應用於運動科學（籃球、足球射門）、物理模擬遊戲、彈道學及工程拋射設計等領域。</p>
+</section>
+
+<section> 
+  <h2>模擬實驗：拋體運動</h2>
+  <div class="control">
+    <label>初速度 (m/s)：<input id="velocity" type="number" value="40"></label>
+    <label>發射角度 (°)：<input id="angle" type="number" value="45"></label>
+    <button onclick="startSimulation()">開始</button>
+    <div id="info" style=" display: flex; justify-content: center; gap: 20px; font-size:25px;">
+        <p>水平距離: <span id="dist">0.00</span> m</p>
+        <p>高度: <span id="height">0.00</span> m</p>
+        <p>飛行時間: <span id="time">0.00</span> s</p>
+    </div>
+  </div>
+  <canvas id="canvas" width="900" height="500"></canvas>
+</section>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const g = 9.8;  
+const scale = 5; 
+
+let x = 2, y = 2;
+let v0 = 0, angle = 0;
+let trajectory = [];
+let animating = false;
+let startTime = null;
+
+const distEl = document.getElementById("dist");
+const heightEl = document.getElementById("height");
+
+function startSimulation() {
+  if(animating) return; 
+  v0 = parseFloat(document.getElementById("velocity").value);
+  angle = parseFloat(document.getElementById("angle").value) * Math.PI / 180;
+
+  x = 0; y = 0;
+  trajectory = [];
+  animating = true;
+  startTime = null;
+  requestAnimationFrame(animate);
+}
+
+function animate(timestamp) {
+  if(!animating) return;
+
+  if (!startTime) startTime = timestamp;  
+  let t = (timestamp - startTime) / 1000; 
+  document.getElementById("time").innerText = t.toFixed(1);
+
+  let vx = v0 * Math.cos(angle);
+  let vy = v0 * Math.sin(angle);
+
+  x = vx * t;
+  y = vy * t - 0.5 * g * t * t;
+
+  let v = Math.sqrt(vx*vx + (vy - g*t)*(vy - g*t));
+
+  distEl.textContent = x.toFixed(2);
+  heightEl.textContent = Math.max(y, 0).toFixed(2); 
+
+  if(y < 0) { animating = false; y = 0; }
+
+  trajectory.push({x, y});
+  draw();
+
+  if(animating) requestAnimationFrame(animate);
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(trajectory.length > 1){
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(230,126,34,0.7)";
+    ctx.moveTo(trajectory[0].x*scale, canvas.height - trajectory[0].y*scale);
+    for(let p of trajectory){
+      ctx.lineTo(p.x*scale, canvas.height - p.y*scale);
+    }
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.arc(x*scale, canvas.height - y*scale, 8, 0, 2*Math.PI);
+  ctx.fillStyle = "red";
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.strokeStyle = "#333";
+  ctx.stroke();
+}
+
+draw();
+</script>
+
+</body>
+</html>

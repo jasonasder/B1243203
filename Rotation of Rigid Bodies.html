@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>圓周運動（Rotation of Rigid Bodies）</title>
+<style>
+  body { font-family: "Microsoft JhengHei", sans-serif; margin:0; padding:0; background:#f7f9fc; color:#333; line-height:1.8; }
+  header { background:#2c3e50; color:#fff; text-align:center; padding:22px 10px; }
+  h1{ margin:0; font-size:26px; }
+  section{ max-width:900px; margin:24px auto; background:#fff; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.08); padding:22px 30px; }
+  h2{ color:#1a5276; border-left:6px solid #1a5276; padding-left:10px; margin-top:18px; font-size: 35px;}
+  p{ margin:8px 0 14px 0; text-align:justify; font-size: 20px;}
+  code{ background:#ecf0f1; padding:2px 6px; border-radius:4px; }
+  .control{ text-align:center; margin-top:14px; display:flex; justify-content:center; gap:7px; flex-wrap:wrap; align-items:center; font-size: 25px; }
+  input, button, select { font-size:15px; padding:6px 8px; margin:4px; }
+  button{ background:#1a5276; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+  button:hover{ background:#2471a3; }
+  canvas{ display:block; margin:16px auto; border:2px solid #333; background:#fff; }
+  #info{ display:flex; justify-content:center; gap:7px; font: size 25px; margin-top:8px; flex-wrap:wrap; } 
+  #info p{ margin:0; font-size: 25px; }
+  @media (max-width:640px){ section{ padding:16px } .control{ gap:8px } #info{ font-size:16px } }
+</style>
+</head>
+<body>
+<header><h1>圓周運動（Rotation of Rigid Bodies）</h1></header>
+
+<section>
+  <h2>定律內容</h2>
+  <p>
+    圓周運動指物體以固定半徑圍繞一中心做圓周路徑運動的情形。若為勻速圓周運動，角速度（或角頻率）維持恆定，
+    則物體具有向心加速度，其方向指向圓心。向心力是維持物體做圓周運動所需的合力。
+  </p>
+
+  <h2>公式表示</h2>
+  <p>
+    角速度：<code>ω</code>（rad/s）<br>
+    線速度：<code>v = ω r</code><br>
+    向心加速度：<code>a_c = v² / r = ω² r</code><br>
+    向心力：<code>F_c = m a_c = m ω² r = m v² / r</code><br>
+    週期：<code>T = 2π / ω</code>
+  </p>
+
+  <h2>圖像理解</h2>
+  <p>
+    圓周運動的向心加速度方向始終指向圓心，速度方向切線於軌道。畫布上會顯示質點、軌道圓圈、速度或向心力向量，
+    幫助理解速度與加速度方向的差異。
+  </p>
+
+  <h2>適用範圍</h2>
+  <p>
+    本模型適用於剛體或質點作圓周運動，忽略空氣阻力或其他摩擦力的理想情形。對於非勻速情況，可視為瞬時角速度變化。
+  </p>
+
+  <h2>常見應用</h2>
+  <p>
+    汽車轉彎的向心力、旋轉機械（風扇、轉子）、行星近似的圓周運動（理想化）、離心機設計等工程與生活情境。
+  </p>
+</section>
+
+<section>
+  <h2>模擬實驗：圓周運動</h2>
+
+  <div class="control">
+    <label>半徑 r (m)：<input id="r" type="number" value="80" min="1" step="1"></label>
+    <label>角速度 ω (rad/s)：<input id="omega" type="number" value="2" step="0.1"></label>
+    <label>質量 m (kg)：<input id="mass" type="number" value="1" step="0.1"></label>
+    <label>顯示向量：
+      <select id="showVec">
+        <option value="none">不顯示</option>
+        <option value="v" selected>速度 v</option>
+        <option value="a">向心加速度 a_c</option>
+        <option value="F">向心力 F_c</option>
+      </select>
+    </label>
+    <button onclick="startRotation()">開始</button>
+    <button onclick="stopRotation()">停止</button>
+    <button onclick="resetRotation()">重設</button>
+  </div>
+
+  <div id="info">
+    <p>角速度 ω: <strong id="omegaVal">2.0</strong> rad/s</p>
+    <p>線速度 v: <strong id="vVal">0.0</strong> m/s</p>
+    <p>向心加速度 a_c: <strong id="aVal">0.0</strong> m/s²</p>
+    <p>向心力 F_c: <strong id="FVal">0.0</strong> N</p>
+    <p>週期 T: <strong id="TVal">0.0</strong> s</p>
+  </div>
+
+  <canvas id="c" width="900" height="500"></canvas>
+  
+</section>
+
+<script>
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// 公尺轉為畫素
+let r_m = parseFloat(document.getElementById('r').value); 
+let omega = parseFloat(document.getElementById('omega').value); 
+let mass = parseFloat(document.getElementById('mass').value); 
+const scale = 2; // 1 公尺 = 2 px
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+
+let angle = 0;
+let rotating = false;
+let lastTimestamp = null;
+
+
+const omegaVal = document.getElementById('omegaVal');
+const vVal = document.getElementById('vVal');
+const aVal = document.getElementById('aVal');
+const FVal = document.getElementById('FVal');
+const TVal = document.getElementById('TVal');
+const showVec = document.getElementById('showVec');
+
+function updateInfo() {
+  omegaVal.innerText = omega.toFixed(2);
+  const v = omega * r_m;
+  const a_c = omega * omega * r_m; 
+  const F_c = mass * a_c; 
+  const T = omega === 0 ? Infinity : (2 * Math.PI / omega);
+
+  vVal.innerText = v.toFixed(2);
+  aVal.innerText = a_c.toFixed(2);
+  FVal.innerText = F_c.toFixed(2);
+  TVal.innerText = (isFinite(T) ? T.toFixed(2) : '∞');
+}
+//畫畫面
+function drawScene() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const r_px = r_m * scale;
+  ctx.beginPath();
+  ctx.strokeStyle = '#b8c0c6';
+  ctx.lineWidth = 2;
+  ctx.arc(centerX, centerY, r_px, 0, Math.PI * 2);
+  ctx.stroke();
+
+  const px = centerX + r_px * Math.cos(angle);
+  const py = centerY + r_px * Math.sin(angle);
+
+  ctx.beginPath();
+  ctx.fillStyle = '#1c7ed6';
+  ctx.arc(px, py, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  const sel = showVec.value;
+
+  if (sel === 'v') {
+    const v = omega * r_m;
+    const len = Math.min(120, v * 8);
+    const tx = -Math.sin(angle); 
+    const ty = Math.cos(angle);  
+    drawArrow(px, py, px + tx * len, py + ty * len, '#27ae60');
+    ctx.fillStyle = '#27ae60';
+    ctx.fillText('v', px + tx * len + 6, py + ty * len + 6);
+  } else if (sel === 'a') {
+    const a_c = omega * omega * r_m;
+    const len = Math.min(140, a_c * 4);
+    const tx = centerX - px;
+    const ty = centerY - py;
+    const mag = Math.hypot(tx, ty);
+    const ux = tx / mag; const uy = ty / mag;
+    // 限制箭頭
+    const limitLen = Math.min(len, Math.hypot(px - centerX, py - centerY) - 10);
+    drawArrow(px, py, px + ux * limitLen, py + uy * limitLen, '#e67e22');
+    ctx.fillStyle = '#e67e22';
+    ctx.fillText('a_c', px + ux * len + 6, py + uy * len + 6);
+  } else if (sel === 'F') {
+    const a_c = omega * omega * r_m;
+    const F = mass * a_c;
+    const len = Math.min(140, F * 0.6);
+    const tx = centerX - px;
+    const ty = centerY - py;
+    const mag = Math.hypot(tx, ty);
+    const ux = tx / mag; const uy = ty / mag;
+    drawArrow(px, py, px + ux * len, py + uy * len, '#8e44ad');
+    ctx.fillStyle = '#8e44ad';
+    ctx.fillText('F_c', px + ux * len + 6, py + uy * len + 6);
+  }
+
+
+  ctx.beginPath();
+  ctx.fillStyle = '#333';
+  ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+//箭頭
+function drawArrow(x1, y1, x2, y2, color) {
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 3;
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const headLen = 8;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6));
+  ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/6), y2 - headLen * Math.sin(angle + Math.PI/6));
+  ctx.closePath();
+  ctx.fill();
+}
+
+//動畫
+function animate(timestamp) {
+  if (!rotating) return;
+  if (!lastTimestamp) lastTimestamp = timestamp;
+  const dt = (timestamp - lastTimestamp) / 1000; 
+  lastTimestamp = timestamp;
+
+  angle += omega * dt;
+
+  updateInfo();
+  drawScene();
+
+  requestAnimationFrame(animate);
+}
+
+
+function startRotation() {
+  // 重刷
+  r_m = parseFloat(document.getElementById('r').value);
+  omega = parseFloat(document.getElementById('omega').value);
+  mass = parseFloat(document.getElementById('mass').value);
+  rotating = true;
+  lastTimestamp = null;
+  angle = 0;
+  updateInfo();
+  requestAnimationFrame(animate);
+}
+
+function stopRotation() {
+  rotating = false;
+  lastTimestamp = null;
+}
+
+function resetRotation() {
+  stopRotation();
+  angle = 0;
+  document.getElementById('r').value = 80;
+  document.getElementById('omega').value = 2;
+  document.getElementById('mass').value = 1;
+  r_m = parseFloat(document.getElementById('r').value);
+  omega = parseFloat(document.getElementById('omega').value);
+  mass = parseFloat(document.getElementById('mass').value);
+  updateInfo();
+  drawScene();
+}
+
+updateInfo();
+drawScene();
+</script>
+</body>
+</html>

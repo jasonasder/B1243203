@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聲波與聽覺 (Sound & Hearing) </title>
+
+<style>
+  body {
+    font-family:"Microsoft JhengHei",sans-serif;
+    margin:0;
+    padding:0;
+    background:#f7f9fc;
+    color:#333;
+    line-height:1.8;
+  }
+  header {
+    background:#2c3e50;
+    color:white;
+    text-align:center;
+    padding:20px 10px;
+  }
+  h1 {
+    margin:0;
+    font-size:50px;
+  }
+  section {
+    max-width:900px;
+    margin:20px auto;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    padding:25px 35px;
+  }
+  h2 {
+    font-size:35px;
+    color:#1a5276;
+    border-left:6px solid #1a5276;
+    padding-left:10px;
+    margin-top:20px;
+    margin-bottom:20px;
+  }
+  p {
+    font-size:20px;
+  }
+  canvas {
+    border:2px solid #333;
+    background:#fff;
+    display:block;
+    margin:20px auto;
+  }
+  .control {
+    text-align:center;
+    margin-top:20px;
+  }
+  input, button {
+    font-size:16px;
+    padding:5px 8px;
+    margin:5px;
+  }
+  label {
+    font-size:25px;
+  }
+  button {
+    background:#1a5276;
+    color:white;
+    border:none;
+    cursor:pointer;
+    border-radius:4px;
+  }
+  button:hover {
+    background:#2471a3;
+  }
+  #info p {
+    font-size:25px;
+    margin:5px;
+  }
+  .warning {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background: #e74c3c;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    font-size: 14px;
+  }
+
+  .warning::after {
+    content: "請避免將振幅調整過大，以免音量過高造成聽覺不適。建議 : 2以下";
+    position: absolute;
+    bottom: 140%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+  .warning:hover::after {
+    opacity: 1;
+  }
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>聲波與聽覺（Sound & Hearing）</h1>
+</header>
+
+<section>
+  <h2>定律內容</h2>
+  <p>
+    聲音是由物體振動產生的機械波，透過介質（如空氣）以縱波形式傳播。
+    聲波可用正弦函數表示，其振幅與頻率分別影響人耳對聲音大小與音高的感覺。
+  </p>
+
+  <h2>公式表示</h2>
+  <p>
+    聲波位移：y = A sin(2πft)<br>
+    A：振幅（影響音量）<br>
+    f：頻率（影響音高）
+  </p>
+
+  <h2>圖像理解</h2>
+  <p>
+    波形的上下振動幅度代表振幅大小，單位時間內的振動次數代表頻率高低。
+    振幅越大，聲音越大聲；頻率越高，音高越高。
+  </p>
+
+  <h2>適用範圍</h2>
+  <p>
+    本模型適用於理想聲波與基本聽覺概念說明，
+    未考慮空氣阻力、能量衰減與複合音波。
+  </p>
+
+  <h2>常見應用</h2>
+  <p>
+    音樂音高分析、聲學工程、醫學聽力測試、
+    語音處理與音訊科技等。
+  </p>
+</section>
+
+<section>
+  <h2>模擬實驗：聲波與聽覺</h2>
+
+  <div class="control">
+    <label>
+      <span class="warning">!</span>
+      振幅 A：
+      <input type="number" id="amplitude" value="1" step="0.1" min="0">
+    </label>
+
+    <label>
+      頻率 f：
+      <input type="number" id="frequency" value="440" step="10" min="1" max="22000">
+      Hz
+    </label>
+    <button onclick="startSound()">開始實驗</button>
+    <button onclick="stopSound()">停止</button>
+
+    <div id="info" style="display:flex; justify-content:center; gap:25px; flex-wrap:wrap;">
+      <p>振幅 A：<span id="ampInfo">0</span>）</p>
+      <p>頻率 f：<span id="freqInfo">0</span> Hz</p>
+      <p>聽覺狀態：<span id="hearInfo">---</span></p>
+    </div>
+  </div>
+
+  <canvas id="canvas" width="900" height="400"></canvas>
+</section>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const yCenter = canvas.height / 2;
+const scale = 80;
+
+let A = 1;
+let f = 440;
+let time = 0;
+let playing = false;
+
+const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let osc = null;
+let gainNode = null;
+
+function startSound(){
+
+
+  if(playing){
+    stopSound();
+  }
+
+  A = parseFloat(document.getElementById("amplitude").value);
+  f = parseFloat(document.getElementById("frequency").value);
+
+  time = 0;
+  playing = true;
+
+  osc = AudioCtx.createOscillator();
+  gainNode = AudioCtx.createGain();
+
+  osc.type = "sine";
+  osc.frequency.value = f;
+  gainNode.gain.value = A / 2;
+
+  osc.connect(gainNode).connect(AudioCtx.destination);
+  osc.start();
+
+  requestAnimationFrame(animate);
+}
+
+
+function stopSound(){
+  playing = false;
+  if(osc){
+    osc.stop();
+    osc = null;
+  }
+}
+
+function animate(){
+  if(!playing) return;
+
+  time += 0.02;
+  drawWave();
+  updateInfo();
+
+  requestAnimationFrame(animate);
+}
+
+function drawWave(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.beginPath();
+  ctx.moveTo(0, yCenter);
+  ctx.lineTo(canvas.width, yCenter);
+  ctx.strokeStyle = "#aaa";
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.strokeStyle = "#1a5276";
+  for(let x=0; x<canvas.width; x++){
+    let t = time + x/100;
+    let y = yCenter - A * scale * Math.sin(2*Math.PI*f*t);
+    if(x===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+
+function updateInfo(){
+  document.getElementById("ampInfo").innerText = A.toFixed(2);
+  document.getElementById("freqInfo").innerText = f.toFixed(0);
+
+  let hearText = "";
+  if(f < 20){
+    hearText = "低於可聽範圍（次聲波）";
+  }else if(f > 20000){
+    hearText = "高於可聽範圍（超音波）";
+  }else{
+    hearText = "人耳可聽";
+  }
+  document.getElementById("hearInfo").innerText = hearText;
+}
+</script>
+
+</body>
+</html>

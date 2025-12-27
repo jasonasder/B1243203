@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平衡與彈性（Equilibrium & Elasticity）</title>
+<style>
+  body { font-family: "Microsoft JhengHei", sans-serif; margin:0; padding:0; background:#f7f9fc; color:#333; line-height:1.8; }
+  header { background:#2c3e50; color:#fff; text-align:center; padding:22px 10px; }
+  h1{ margin:0; font-size:26px; }
+  section{ max-width:900px; margin:24px auto; background:#fff; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.08); padding:22px 30px; }
+  h2{ color:#1a5276; border-left:6px solid #1a5276; padding-left:10px; margin-top:18px; font-size: 35px;}
+  p{ margin:8px 0 14px 0; text-align:justify; font-size: 20px;}
+  code{ background:#ecf0f1; padding:2px 6px; border-radius:4px; }
+  .control{ text-align:center; margin-top:14px; display:flex; justify-content:center; gap:7px; flex-wrap:wrap; align-items:center; font-size: 25px; }
+  input, button { font-size:18px; padding:6px 10px; margin:4px; }
+  button{ background:#1a5276; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+  button:hover{ background:#2471a3; }
+  canvas{ display:block; margin:16px auto; border:2px solid #333; background:#fff; }
+  #info{ display:flex; justify-content:center; gap:14px; font-size:22px; margin-top:8px; flex-wrap:wrap; } 
+  #info p{ margin:0; font-size: 22px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>平衡與彈性（Equilibrium & Elasticity）</h1>
+</header>
+
+<section>
+  <h2>定律內容</h2>
+  <p>
+    靜力平衡（Equilibrium）表示物體受力與力矩加總為零。力矩（torque）定義為力與其作用線到支點的距離之乘積：<code>τ = F · r</code>。
+    在翹翹板或天秤式的平衡問題中，左右兩側的力矩相等（Στ = 0）則系統平衡；否則會產生轉矩使桿子傾斜。
+  </p>
+
+  <h2>公式表示</h2>
+  <p>
+    力矩（對支點）：<code>τ = F · r = m · g · r</code>（N·m）<br>
+    平衡條件：<code>Στ_left = Στ_right</code>（若相等則不轉動）。<br>
+    當存在力矩差時，桿子會產生角位移，其大小取決於力矩差與支撐剛度（本模擬以視覺化比例顯示）。
+  </p>
+
+  <h2>圖像理解</h2>
+  <p>
+    畫面以水平桿為示意（中心為支點），在桿上左右放置砝碼。頁面會顯示左、右兩側的力矩大小與差值，並以動畫呈現桿的傾斜情形 —— 力矩大的那側朝下。
+  </p>
+
+  <h2>適用範圍</h2>
+  <p>
+    適用於靜態或緩慢變化的剛體問題，忽略桿本身質量或將桿質量視為可單獨計算之參數。若桿有顯著彈性，則需考慮扭轉剛度（本模擬以簡化模型示意）。
+  </p>
+
+  <h2>常見應用</h2>
+  <p>
+    天秤、翹翹板、橋梁負載分析、機械槓桿設計等，設計時需考慮力矩與支撐條件以確保結構或裝置保持穩定。
+  </p>
+</section>
+<section>
+  <h2>實驗模擬：力矩平衡</h2>
+
+  <div class="control">
+    <label>左質量 m₁ (kg)：<input type="number" id="m1" value="2.0" step="0.1"></label>
+    <label>左距離 r₁ (m)：<input type="number" id="r1" value="1.6" step="0.1"></label>
+    <label>右質量 m₂ (kg)：<input type="number" id="m2" value="1.0" step="0.1"></label>
+    <label>右距離 r₂ (m)：<input type="number" id="r2" value="10" step="0.1"></label>
+    <button onclick="apply()">開始</button>
+  </div>
+  <div id="info">
+      <p id="tau1">τ₁: 0 N·m</p>
+      <p id="tau2">τ₂: 0 N·m</p>
+      <p id="delta">Δτ: 0 N·m</p>
+      <p id="state">狀態: 平衡</p>
+    </div>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  
+</section>
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const g = 9.8;
+  const pxPerMeter = 20;
+  const beamHalf = 300;
+  const angleScale = 0.35; 
+
+  let m1=2,r1=1.6,m2=1,r2=10;
+  let angle=0,targetAngle=0;
+  const maxAngle=Math.PI/10;
+
+  function clamp(v,min,max){
+    return Math.min(Math.max(v,min),max);
+  }
+
+  function drawBeam(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width/2,canvas.height/2+40);
+    ctx.rotate(angle);
+
+    ctx.fillStyle="#e1e4e8";
+    ctx.fillRect(-beamHalf,-10,beamHalf*2,20);
+
+    ctx.beginPath();
+    ctx.arc(0,0,6,0,2*Math.PI);
+    ctx.fillStyle="black";
+    ctx.fill();
+
+    
+    let lx=clamp(-r1*pxPerMeter,-beamHalf+20,-20);
+    ctx.fillStyle="blue";
+    ctx.fillRect(lx-15,-50,30,30);
+
+
+    let rx=clamp(r2*pxPerMeter,20,beamHalf-20);
+    ctx.fillStyle="red";
+    ctx.fillRect(rx-15,-50,30,30);
+
+    ctx.restore();
+  }
+
+  function apply(){
+    m1=+m1Input.value;
+    r1=+r1Input.value;
+    m2=+m2Input.value;
+    r2=+r2Input.value;
+
+    let tau1=m1*g*r1;
+    let tau2=m2*g*r2;
+    let delta=tau1-tau2;
+
+    tau1El.textContent=`τ₁: ${tau1.toFixed(2)}`;
+    tau2El.textContent=`τ₂: ${tau2.toFixed(2)}`;
+    deltaEl.textContent=`Δτ: ${delta.toFixed(2)}`;
+    stateEl.textContent=Math.abs(delta)<1?"狀態: 平衡":"狀態: 不平衡";
+
+    let norm=delta/(Math.abs(tau1)+Math.abs(tau2));
+    targetAngle=clamp(-norm*maxAngle*angleScale,-maxAngle,maxAngle);
+  }
+
+  function animate(){
+    angle+=(targetAngle-angle)*0.05;
+    drawBeam();
+    requestAnimationFrame(animate);
+  }
+
+
+  const m1Input=document.getElementById("m1");
+  const r1Input=document.getElementById("r1");
+  const m2Input=document.getElementById("m2");
+  const r2Input=document.getElementById("r2");
+  const tau1El=document.getElementById("tau1");
+  const tau2El=document.getElementById("tau2");
+  const deltaEl=document.getElementById("delta");
+  const stateEl=document.getElementById("state");
+
+  apply();
+  animate();
+</script>
+</body>
+</html>

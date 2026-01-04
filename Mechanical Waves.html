@@ -6,143 +6,179 @@
 <title>機械波（Mechanical Waves）</title>
 
 <style>
-body { 
-  font-family:"Microsoft JhengHei",sans-serif; 
-  margin:0; 
-  padding:0; 
-  background:#f7f9fc; 
-  color:#333; 
-  line-height:1.8; 
-}
-header { 
-  background:#2c3e50; 
-  color:white; 
-  text-align:center; 
-  padding:20px 10px; }
-h1 { 
-  margin:0; 
-  font-size:50px; }
-section{ 
-  max-width:900px; 
-  margin:24px auto; 
-  background:#fff; 
-  border-radius:12px; 
-  box-shadow:0 3px 10px rgba(0,0,0,0.08); 
-  padding:22px 30px; 
-}
-h2{ 
-  color:#1a5276; 
-  border-left:6px solid #1a5276; 
-  padding-left:10px; 
-  margin-top:18px; 
-  font-size:35px;
-}
-p{ 
-  margin:8px 0 14px 0; 
-  text-align:justify; 
-  font-size:20px;
-}
-.control{ 
-  text-align:center; 
-  margin-top:14px; 
-  display:flex; 
-  justify-content:center; 
-  gap:7px; 
-  flex-wrap:wrap; 
-  align-items:center; 
-  font-size:25px; 
-}
-input, button { 
-  font-size:18px; 
-  padding:6px 10px; 
-  margin:4px; 
-}
-button{ 
-  background:#1a5276; 
-  color:#fff; 
-  border:none; 
-  border-radius:5px; 
-  cursor:pointer; 
-}
-button:hover{ 
-  background:#2471a3; 
-}
-canvas{ 
-  display:block; 
-  margin:16px auto; 
-  border:2px solid #333; 
-  background:#fff; 
-}
-#info{ 
-  display:flex; 
-  justify-content:center; 
-  gap:14px; 
-  font-size:22px; 
-  margin-top:8px; 
-  flex-wrap:wrap; 
-}
-#info p{ 
-  margin:0; 
-  font-size:22px; 
-}
+  body { 
+    font-family:"Microsoft JhengHei",sans-serif; 
+    margin:0; padding:0; 
+    background: url('img/bb.webp') no-repeat center center fixed; 
+    background-size: cover;
+    color:#333; 
+    line-height:1.8; 
+  }
+
+  nav {
+    background: rgba(44, 62, 80);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  nav .menu a {
+    color: #ecf0f1;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  nav .menu a:hover { color: #f1c40f; }
+
+  header { 
+    background: rgba(52, 73, 94, 0.85); 
+    color:white; 
+    text-align:center; 
+    padding:10px 10px; 
+  }
+  h1 { margin:0; font-size:50px; }
+
+  section { 
+    max-width:900px; 
+    margin:25px auto; 
+    background: rgba(255, 255, 255, 0.92); 
+    border-radius:12px; 
+    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
+    padding:30px 40px; 
+  }
+
+  h2 { 
+    color:#1a5276; 
+    border-left:6px solid #1a5276; 
+    padding-left:15px; 
+    margin-top:20px; 
+    font-size:35px;
+  }
+  p { font-size:20px; text-align:justify; }
+
+  .formula-box {
+    background: rgba(26, 82, 118, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #1a5276;
+    margin: 15px 0;
+  }
+
+  .control-panel {
+    background: #fdfefe;
+    border: 1px solid #d5dbdb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .control { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 15px; 
+  }
+  .control-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  label { font-size: 22px; font-weight: bold; }
+  input { font-size:18px; padding:6px; width: 80px; border-radius:4px; border:1px solid #ccc; }
+  
+  button { 
+    background:#1a5276; 
+    color:#fff; 
+    border:none; 
+    border-radius:5px; 
+    cursor:pointer; 
+    padding: 8px 25px;
+    font-size: 18px;
+    transition: 0.3s;
+  }
+  button:hover { background:#2471a3; transform: scale(1.05); }
+
+  #info { 
+    display:flex; 
+    justify-content:center; 
+    border-top: 1px solid #eee;
+
+  }
+  #info p { font-size: 25px; font-weight: bold; color: #d35400; }
+
+  canvas { 
+    display:block; 
+    margin:20px auto; 
+    border:2px solid #333; 
+    background:#fff; 
+    border-radius: 5px;
+  }
 </style>
 </head>
 
 <body>
+
+<nav>
+  <div class="menu">
+    <a href="index.html">首頁 (Home)</a>
+    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
+    <a href="Mechanical Waves.html" style="color:#f1c40f">機械波</a>
+    <a href="Projectile Motion.html">拋體運動</a>
+    <a href="Rotation of Rigid Bodies.html">圓周旋轉</a>
+    <a href="Sound & Hearing.html">聲音聽覺</a>
+  </div>
+</nav>
+
 <header>
   <h1>機械波（Mechanical Waves）</h1>
 </header>
 
 <section>
   <h2>定律內容</h2>
-  <p>
-    機械波是介質中粒子的週期性振動所形成的能量傳遞現象，
-    粒子僅在平衡位置附近振動，能量隨波動向前傳播。
-  </p>
+  <p>機械波是介質中粒子的週期性振動所形成的能量傳遞現象，粒子僅在平衡位置附近振動，能量隨波動向前傳播。</p>
 
   <h2>公式表示</h2>
-  <p>
-    波速：<code>v = fλ</code><br>
-    波動方程（簡諧波）：<code>y(x,t) = A sin(2π(x/λ − ft))</code>
-  </p>
+  <div class="formula-box">
+    波速：v = f · λ<br>
+    波動方程（簡諧波）：y(x,t) = A sin(2π(x/λ − ft))
+  </div>
+
+  
 
   <h2>圖像理解</h2>
-  <p>
-    圖中顯示的是沿 x 方向傳播的橫波。
-    振幅 A 影響位移大小，頻率 f 影響振動快慢，
-    波長 λ 則決定空間中波峰之間的距離。
-  </p>
-  <h2>🧭 適用範圍</h2>
-  <p>
-    本定律適用於<strong>需要介質傳播的機械波</strong>，例如固體、液體或氣體中的波動現象。
-    分析對象通常假設介質為<strong>連續、均勻且各向同性</strong>，
-    且粒子振動幅度相對於波長足夠小，使系統可近似為<strong>線性簡諧波</strong>。
-  </p>
-  <p>
-    本模型適合用於<strong>低能量、非破壞性</strong>的波動情境，
-    並忽略能量耗散、摩擦與非線性效應。
-    若振幅過大、介質出現阻尼、邊界反射或非線性行為，
-    則需使用更進階的波動或數值模型進行分析。
-  </p>
+  <p>圖中顯示的是沿 x 方向傳播的橫波。振幅 A 影響位移大小，頻率 f 影響振動快慢，波長 λ 則決定空間中波峰之間的距離。</p>
+
+  <h2>適用範圍</h2>
+  <p>本定律適用於需要介質傳播的機械波。分析對象通常假設介質為連續、均勻且各向同性。本模型適合用於低能量、線性簡諧波情境，不考慮能量耗散或非線性效應。</p>
+
   <h2>常見應用</h2>
-  <p>
-    聲波傳播、地震波、繩波實驗、水面波與工程振動分析等。
-  </p>
+  <p>聲波傳播、地震波、繩波實驗、水面波與工程振動分析等。</p>
 </section>
 
 <section>
   <h2>實驗模擬：機械波傳播</h2>
 
-  <div class="control">
-    <label>振幅 A (m)：<input id="A" type="number" value="2" step="0.1"></label>
-    <label>波長 λ (m)：<input id="lambda" type="number" value="4" step="0.5"></label>
-    <label>頻率 f (Hz)：<input id="f" type="number" value="1" step="0.1"></label>
-    <button onclick="apply()">開始</button>
-    <button onclick="reset()">重設</button>
-  </div>
+  <div class="control-panel">
+    <div class="control">
+      <div class="control-row">
+        <label>振幅 A (m)：<input id="A" type="number" value="2" step="0.1"></label>
+        <label>波長 λ (m)：<input id="lambda" type="number" value="4" step="0.5"></label>
+      </div>
+      <div class="control-row">
+        <label>頻率 f (Hz)：<input id="f" type="number" value="1" step="0.1"></label>
+        <button id="startBtn" onclick="toggleSimulation()">開始</button>
+        <button onclick="reset()" style="background:#7f8c8d;">重設</button>
+      </div>
+    </div>
 
-  <div id="info">
-    <p id="speed">波速 v = 0 m/s</p>
+    <div id="info">
+      <p id="speed">波速 v = 4.00 m/s</p>
+    </div>
   </div>
 
   <canvas id="canvas" width="800" height="420"></canvas>
@@ -154,6 +190,8 @@ const ctx = canvas.getContext("2d");
 
 let A = 2, lambda = 4, f = 1;
 let t = 0;
+let isRunning = false;
+let animationId;
 
 const pxPerMeterX = 80;
 const pxPerMeterY = 80;
@@ -161,39 +199,21 @@ const pxPerMeterY = 80;
 function drawAxes(){
   const ox = 100;
   const oy = canvas.height / 2;
-
   ctx.strokeStyle = "#aaa";
   ctx.lineWidth = 1;
-
-  ctx.beginPath();
-  ctx.moveTo(ox, oy);
-  ctx.lineTo(canvas.width - 20, oy);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(ox, 20);
-  ctx.lineTo(ox, canvas.height - 20);
-  ctx.stroke();
-
+  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(canvas.width - 20, oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, canvas.height - 20); ctx.stroke();
   ctx.font = "14px Microsoft JhengHei";
   ctx.fillStyle = "#333";
-
   [2,1,0,-1,-2].forEach(v=>{
     const y = oy - v * pxPerMeterY;
-    ctx.beginPath();
-    ctx.moveTo(ox-6,y);
-    ctx.lineTo(ox+6,y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox-6,y); ctx.lineTo(ox+6,y); ctx.stroke();
     ctx.fillText(v, ox-30, y+4);
   });
   ctx.fillText("y (m)", 20, 30);
-
   for(let x=2;x<=8;x+=2){
     const px = ox + x * pxPerMeterX;
-    ctx.beginPath();
-    ctx.moveTo(px, oy-6);
-    ctx.lineTo(px, oy+6);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, oy-6); ctx.lineTo(px, oy+6); ctx.stroke();
     ctx.fillText(x, px-6, oy+20);
   }
   ctx.fillText("x (m)", canvas.width-60, oy+40);
@@ -202,14 +222,11 @@ function drawAxes(){
 function drawWave(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawAxes();
-
   const ox = 100;
   const oy = canvas.height/2;
-
   ctx.strokeStyle="#1c7ed6";
-  ctx.lineWidth=2;
+  ctx.lineWidth=3;
   ctx.beginPath();
-
   for(let x=0;x<=8;x+=0.02){
     const y = A * Math.sin(2*Math.PI*(x/lambda - f*t));
     const cx = ox + x * pxPerMeterX;
@@ -220,30 +237,53 @@ function drawWave(){
   ctx.stroke();
 }
 
+function toggleSimulation() {
+  const btn = document.getElementById("startBtn");
+  isRunning = !isRunning;
+  if (isRunning) {
+    apply();
+    btn.textContent = "暫停";
+    btn.style.background = "#d35400";
+    animate();
+  } else {
+    btn.textContent = "開始";
+    btn.style.background = "#1a5276";
+    cancelAnimationFrame(animationId);
+  }
+}
+
 function apply(){
   A = parseFloat(document.getElementById("A").value);
   lambda = parseFloat(document.getElementById("lambda").value);
   f = parseFloat(document.getElementById("f").value);
-
-  document.getElementById("speed").textContent =
-    `波速 v = ${(f * lambda).toFixed(2)} m/s`;
+  document.getElementById("speed").textContent = `波速 v = ${(f * lambda).toFixed(2)} m/s`;
+  if(!isRunning) drawWave();
 }
 
 function reset(){
+  isRunning = false;
+  t = 0;
+  cancelAnimationFrame(animationId);
   document.getElementById("A").value = 2;
   document.getElementById("lambda").value = 4;
   document.getElementById("f").value = 1;
+  const btn = document.getElementById("startBtn");
+  btn.textContent = "開始";
+  btn.style.background = "#1a5276";
   apply();
+  drawWave();
 }
 
 function animate(){
-  t += 0.02;
+  if (!isRunning) return;
+  t += 0.015;
   drawWave();
-  requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
 }
 
 apply();
-animate();
+drawWave();
 </script>
+
 </body>
 </html>

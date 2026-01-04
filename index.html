@@ -3,89 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>物理實驗首頁</title>
+<title>物理實驗與理論探索</title>
+
 <style>
-  /* 全域設定 */
-  body { font-family: "Microsoft JhengHei", sans-serif; margin:0; padding:0; background:#f5f5f5; color:#333; }
-  a { text-decoration: none; color: inherit; }
+  /* 全域設定：深色視覺基調 */
+  body {
+    font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+    margin: 0;
+    background-color: #0a192f; /* 深藍黑色底 */
+    background-image: 
+      radial-gradient(circle at 50% 50%, #172a45 0%, #0a192f 100%);
+    color: #ccd6f6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 
-  /* 導覽列 */
-  header { position: sticky; top:0; background:#ffffff; box-shadow:0 2px 5px rgba(0,0,0,0.1); z-index:1000; }
-  nav { display:flex; justify-content:center; gap:20px; padding:14px 0; }
-  nav a { padding:8px 16px; border-radius:6px; transition:0.3s; }
-  nav a:hover { background:#e0e0e0; }
+  /* 科技感背景網格 */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+      linear-gradient(rgba(100, 255, 218, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100, 255, 218, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+  }
 
-  /* 首頁標題 */
-  .hero { text-align:center; padding:40px 20px 40px 20px; }
-  .hero h1 { font-size:60px; margin-bottom:12px; color:#444; }
-  .hero p { font-size:18px; color:#666; }
+  /* 首頁標題區 */
+  .hero {
+    text-align: center;
+    padding: 50px 20px 60px;
+  }
+  .hero h1 {
+    font-size: 70px;
+    margin-bottom: 20px;
+    color: #64ffda; 
+    text-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
+    letter-spacing: 5px;
+  }
+  .hero p {
+    font-size: 1.2rem;
+    color: #8892b0;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
 
   /* 卡片容器 */
-  .cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px; max-width:1200px; margin:40px auto; padding:0 20px; }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    max-width: 1300px;
+    margin: 20px auto 100px;
+    padding: 0 40px;
+  }
 
-  /* 單個卡片 */
-  .card { background:#ffffff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow:hidden; transition: transform 0.3s, box-shadow 0.3s; cursor:pointer; display:flex; flex-direction: column; }
-  .card:hover { transform: translateY(-6px); box-shadow:0 8px 16px rgba(0,0,0,0.15); }
-  .card img { width:100%; height:150px; object-fit:cover; }
-  .card-content { padding:16px; flex-grow:1; }
-  .card-content h3 { margin:0 0 10px 0; font-size:22px; color:#333; }
-  .card-content p { margin:0; color:#666; font-size:16px; }
+  /* 毛玻璃卡片設計 */
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    flex-direction: column;
+  }
 
-  /* footer */
-  footer { text-align:center; padding:20px; font-size:14px; color:#999; }
+  .card:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: #64ffda;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 15px rgba(100, 255, 218, 0.1);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  /* 圖片包裝與效果 */
+  .card-img-wrapper {
+    height: 190px;
+    overflow: hidden;
+    background: #000;
+  }
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7; /* 平時暗一些 */
+    transition: 0.6s ease;
+    filter: grayscale(30%);
+  }
+  .card:hover img {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: grayscale(0%);
+  }
+
+  .card-content {
+    padding: 25px;
+  }
+
+  /* 霓虹標籤 */
+  .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(100, 255, 218, 0.1);
+    color: #64ffda;
+    font-size: 11px;
+    border-radius: 50px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(100, 255, 218, 0.4);
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .card-content h3 {
+    margin: 0 0 15px;
+    font-size: 22px;
+    color: #e6f1ff;
+    transition: 0.3s;
+  }
+  .card:hover h3 {
+    color: #64ffda;
+  }
+
+  .card-content p {
+    margin: 0;
+    font-size: 15px;
+    color: #8892b0;
+    line-height: 1.6;
+  }
+
+  footer {
+    text-align: center;
+    padding: 80px 20px;
+    font-size: 14px;
+    color: #495670;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(10, 25, 47, 0.8);
+  }
 </style>
 </head>
+
 <body>
 
 <section class="hero">
-  <h1>物理實驗與理論</h1>
-  <p>探索力學、波動、運動與聲音的原理，點擊下方卡片進入各個實驗頁面。</p>
+  <h1>物理網頁</h1>
+  <p>模擬物理實驗</p>
 </section>
 
 <section class="cards">
+
   <div class="card" onclick="location.href='Equilibrium & Elasticity.html'">
-    <img src="https://via.placeholder.com/400x150.png?text=平衡與彈性" alt="平衡與彈性">
+    <div class="card-img-wrapper">
+      <img src="img/EQ.png" alt="平衡與彈性">
+    </div>
     <div class="card-content">
+      <span class="tag">MECHANICS</span>
       <h3>平衡與彈性</h3>
-      <p>學習靜力平衡與力矩概念，了解槓桿與支點的原理。</p>
+      <p>探索靜力平衡的奧秘，從力矩到槓桿原理，理解結構穩定的終極條件。</p>
     </div>
   </div>
 
   <div class="card" onclick="location.href='Mechanical Waves.html'">
-    <img src="https://via.placeholder.com/400x150.png?text=機械波" alt="機械波">
+    <div class="card-img-wrapper">
+      <img src="img/MW.png" alt="機械波">
+    </div>
     <div class="card-content">
+      <span class="tag">WAVE OPTICS</span>
       <h3>機械波</h3>
-      <p>探索介質中能量傳遞的波動現象，橫波與縱波的特性。</p>
+      <p>視覺化能量在介質中的傳遞過程，掌握波速、頻率與相位間的連動關係。</p>
     </div>
   </div>
 
   <div class="card" onclick="location.href='Projectile Motion.html'">
-    <img src="https://via.placeholder.com/400x150.png?text=拋體運動" alt="拋體運動">
+    <div class="card-img-wrapper">
+      <img src="img/PM.jpg" alt="拋體運動">
+    </div>
     <div class="card-content">
+      <span class="tag">DYNAMICS</span>
       <h3>拋體運動</h3>
-      <p>觀察物體拋射軌跡與運動公式，理解水平與垂直運動分量。</p>
+      <p>在重力場中描繪完美的拋物線，解析水平勻速與垂直勻加速的運動合成。</p>
     </div>
   </div>
 
   <div class="card" onclick="location.href='Rotation of Rigid Bodies.html'">
-    <img src="https://via.placeholder.com/400x150.png?text=剛體旋轉" alt="剛體旋轉">
+    <div class="card-img-wrapper">
+      <img src="img/RO.png" alt="剛體旋轉">
+    </div>
     <div class="card-content">
-      <h3>圓周運動</h3>
-      <p>介紹角動量、轉動慣量與剛體旋轉運動的基本概念。</p>
+      <span class="tag">ROTATION</span>
+      <h3>圓周與旋轉運動</h3>
+      <p>從角動量到轉動慣量，深入探討物體在旋轉系統下的動力學行為。</p>
     </div>
   </div>
 
   <div class="card" onclick="location.href='Sound & Hearing.html'">
-    <img src="https://via.placeholder.com/400x150.png?text=聲音與聽覺" alt="聲音與聽覺">
+    <div class="card-img-wrapper">
+      <img src="img/SH.png" alt="聲音與聽覺">
+    </div>
     <div class="card-content">
+      <span class="tag">ACOUSTICS</span>
       <h3>聲音與聽覺</h3>
-      <p>了解聲波的傳播、音調、響度及人耳對聲音的感知原理。</p>
+      <p>解構聲波的物理特性，探索人耳如何捕捉並解析空氣中的微小壓力震動。</p>
     </div>
   </div>
+
 </section>
 
 <footer>
-  &copy; 2025 物理實驗網站
+  © 2025 物理實驗與理論探索實驗室｜B1243203<br>
+  Designed for Academic Excellence.
 </footer>
 
 </body>

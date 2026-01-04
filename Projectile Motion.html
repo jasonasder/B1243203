@@ -5,22 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>拋體運動 (Projectile Motion )</title>
 <style>
-  body { font-family:"Microsoft JhengHei",sans-serif; margin:0; padding:0; background:#f7f9fc; color:#333; line-height:1.8; }
-  header { background:#2c3e50; color:white; text-align:center; padding:20px 10px; }
+  body { 
+    font-family:"Microsoft JhengHei",sans-serif; 
+    margin:0; padding:0; 
+    background: url('img/bb.webp') no-repeat center center fixed; 
+    background-size: cover;
+    color:#333; 
+    line-height:1.8; 
+  }
+
+  nav {
+    background: rgba(44, 62, 80);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  nav .menu a {
+    color: #ecf0f1;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  nav .menu a:hover { color: #f1c40f; }
+
+  header { 
+    background: rgba(52, 73, 94, 0.85); 
+    color:white; 
+    text-align:center; 
+  }
   h1 { margin:0; font-size:50px; }
-  section { max-width:900px; margin:20px auto; background:white; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.1); padding:25px 35px; }
-  h2 { font-size:35px;color:#1a5276; border-left:6px solid #1a5276; padding-left:10px; margin-top:20px; margin-bottom:20px; }
-  canvas { border:2px solid #333; background:#fff; display:block; margin:20px auto; }
-  .control { text-align:center; margin-top:20px; }
+
+  section { 
+    max-width:900px; 
+    margin:25px auto; 
+    background: rgba(255, 255, 255, 0.92); 
+    border-radius:12px; 
+    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
+    padding:30px 40px; 
+  }
+
+  h2 { 
+    font-size:35px;
+    color:#1a5276; 
+    border-left:6px solid #1a5276; 
+    padding-left:15px; 
+    margin-top:20px; 
+    margin-bottom:20px; 
+  }
+
+  p { font-size: 20px; }
+
+  .formula-box {
+    background: rgba(26, 82, 118, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #1a5276;
+    margin: 15px 0;
+  }
+
+  .control-panel {
+    background: #fdfefe;
+    border: 1px solid #d5dbdb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  canvas { 
+    border:2px solid #333; 
+    background:#fff; 
+    display:block; 
+    margin:20px auto; 
+    border-radius: 5px;
+  }
+
   input, button { font-size:16px; padding:5px 8px; margin:5px; }
-  button { background:#1a5276; color:white; border:none; cursor:pointer; border-radius:4px; }
+  button { 
+    background:#1a5276; 
+    color:white; 
+    border:none; 
+    cursor:pointer; 
+    border-radius:4px; 
+    padding: 8px 20px;
+    font-size: 18px;
+  }
   button:hover { background:#2471a3; }
-  p{font-size: 20px;}
-  #info p {font-size: 25px;     margin: 5px;}
-  label{font-size: 25px;}
+
+  label { font-size: 25px; font-weight: bold; }
+  
+  #info { 
+    display: flex; 
+    justify-content: center; 
+    gap: 30px; 
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+  }
+  #info p { font-size: 25px; margin: 5px; font-weight: bold; }
+  /* 數據顏色設為橘色方便辨識 */
+  #info span { color: #d35400; }
 </style>
 </head>
 <body>
+
+<nav>
+  <div class="menu">
+    <a href="index.html">首頁 (Home)</a>
+    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
+    <a href="Mechanical Waves.html">機械波</a>
+    <a href="Projectile Motion.html" style="color:#f1c40f">拋體運動</a>
+    <a href="Rotation of Rigid Bodies.html">圓周與旋轉</a>
+    <a href="Sound & Hearing.html">聲音與聽覺</a>
+  </div>
+</nav>
 
 <header>
   <h1>拋體運動（Projectile Motion）</h1>
@@ -31,14 +134,18 @@
   <p>拋體運動是物體以初速度 v₀ 與水平面成角 θ 被拋出後，只受重力影響的運動。水平方向勻速，垂直方向受重力影響，形成拋物線軌跡。</p>
 
   <h2>公式表示</h2>
-  <p>
-    水平速度：vₓ = v₀ cosθ<br>
-    垂直速度：vᵧ = v₀ sinθ - g t<br>
-    位移：x = v₀ cosθ · t，y = v₀ sinθ · t - ½ g t²<br>
-    最大高度：hₘₐₓ = (v₀² sin²θ)/(2g)<br>
-    飛行時間：T = (2v₀ sinθ)/g<br>
-    水平射程：R = (v₀² sin(2θ))/g
-  </p>
+  <div class="formula-box">
+    <p style="margin:0;">
+      水平速度：vₓ = v₀ cosθ<br>
+      垂直速度：vᵧ = v₀ sinθ - g t<br>
+      位移：x = v₀ cosθ · t，y = v₀ sinθ · t - ½ g t²<br>
+      最大高度：hₘₐₓ = (v₀² sin²θ)/(2g)<br>
+      飛行時間：T = (2v₀ sinθ)/g<br>
+      水平射程：R = (v₀² sin(2θ))/g
+    </p>
+  </div>
+  
+  
 
   <h2>圖像理解</h2>
   <p>軌跡是一條對稱的拋物線。物體先上升至最高點，速度垂直分量為0，再下降至地面。忽略空氣阻力時，形狀由初速度與角度決定。</p>
@@ -52,11 +159,13 @@
 
 <section> 
   <h2>模擬實驗：拋體運動</h2>
-  <div class="control">
-    <label>初速度 (m/s)：<input id="velocity" type="number" value="40"></label>
-    <label>發射角度 (°)：<input id="angle" type="number" value="45"></label>
-    <button onclick="startSimulation()">開始</button>
-    <div id="info" style=" display: flex; justify-content: center; gap: 20px; font-size:25px;">
+  <div class="control-panel">
+    <div class="control">
+      <label>初速度 (m/s)：<input id="velocity" type="number" value="40"></label>
+      <label>發射角度 (°)：<input id="angle" type="number" value="45"></label>
+      <button onclick="startSimulation()">開始</button>
+    </div>
+    <div id="info">
         <p>水平距離: <span id="dist">0.00</span> m</p>
         <p>高度: <span id="height">0.00</span> m</p>
         <p>飛行時間: <span id="time">0.00</span> s</p>
@@ -71,20 +180,24 @@ const ctx = canvas.getContext("2d");
 const g = 9.8;  
 const scale = 5; 
 
-let x = 2, y = 2;
+let x = 0, y = 0;
 let v0 = 0, angle = 0;
 let trajectory = [];
 let animating = false;
 let startTime = null;
 
+// 取得顯示數據的元素
 const distEl = document.getElementById("dist");
 const heightEl = document.getElementById("height");
+const timeEl = document.getElementById("time");
 
 function startSimulation() {
   if(animating) return; 
+  
   v0 = parseFloat(document.getElementById("velocity").value);
   angle = parseFloat(document.getElementById("angle").value) * Math.PI / 180;
-
+  
+  // 重置數據
   x = 0; y = 0;
   trajectory = [];
   animating = true;
@@ -94,52 +207,65 @@ function startSimulation() {
 
 function animate(timestamp) {
   if(!animating) return;
-
   if (!startTime) startTime = timestamp;  
+  
   let t = (timestamp - startTime) / 1000; 
-  document.getElementById("time").innerText = t.toFixed(1);
-
+  
   let vx = v0 * Math.cos(angle);
   let vy = v0 * Math.sin(angle);
-
+  
   x = vx * t;
   y = vy * t - 0.5 * g * t * t;
-
-  let v = Math.sqrt(vx*vx + (vy - g*t)*(vy - g*t));
-
-  distEl.textContent = x.toFixed(2);
-  heightEl.textContent = Math.max(y, 0).toFixed(2); 
-
-  if(y < 0) { animating = false; y = 0; }
-
+  
+  // 更新畫面上顯示的數值
+  timeEl.innerText = t.toFixed(2);
+  distEl.innerText = x.toFixed(2);
+  heightEl.innerText = Math.max(y, 0).toFixed(2); 
+  
+  // 落地判斷
+  if(y < 0) { 
+    animating = false; 
+    y = 0; 
+    // 落地瞬間數值微調回理論值
+    const finalT = (2 * v0 * Math.sin(angle)) / g;
+    timeEl.innerText = finalT.toFixed(2);
+    distEl.innerText = (vx * finalT).toFixed(2);
+    heightEl.innerText = "0.00";
+  }
+  
   trajectory.push({x, y});
   draw();
-
+  
   if(animating) requestAnimationFrame(animate);
 }
 
 function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
+  
+  // 畫路徑
   if(trajectory.length > 1){
     ctx.beginPath();
     ctx.strokeStyle = "rgba(230,126,34,0.7)";
+    ctx.lineWidth = 3;
     ctx.moveTo(trajectory[0].x*scale, canvas.height - trajectory[0].y*scale);
     for(let p of trajectory){
       ctx.lineTo(p.x*scale, canvas.height - p.y*scale);
     }
     ctx.stroke();
   }
-
+  
+  // 畫拋體物
   ctx.beginPath();
   ctx.arc(x*scale, canvas.height - y*scale, 8, 0, 2*Math.PI);
   ctx.fillStyle = "red";
   ctx.fill();
-
+  
+  // 畫地平線
   ctx.beginPath();
   ctx.moveTo(0, canvas.height);
   ctx.lineTo(canvas.width, canvas.height);
   ctx.strokeStyle = "#333";
+  ctx.lineWidth = 2;
   ctx.stroke();
 }
 

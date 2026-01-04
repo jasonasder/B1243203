@@ -5,23 +5,144 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>平衡與彈性（Equilibrium & Elasticity）</title>
 <style>
-  body { font-family: "Microsoft JhengHei", sans-serif; margin:0; padding:0; background:#f7f9fc; color:#333; line-height:1.8; }
-  header { background:#2c3e50; color:white; text-align:center; padding:20px 10px; }
+  body { 
+    font-family: "Microsoft JhengHei", sans-serif; 
+    margin:0; padding:0; 
+    background: url('img/bb.webp') no-repeat center center fixed; 
+    background-size: cover;
+    color:#333; 
+    line-height:1.8; 
+  }
+  nav {
+    background: rgba(44, 62, 80);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  nav .menu a {
+    color: #ecf0f1;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  nav .menu a:hover { color: #f1c40f; }
+
+  header { 
+    background: rgba(52, 73, 94, 0.85); 
+    color:white; 
+    text-align:center; 
+    padding: 10px 10px;
+  }
   h1 { margin:0; font-size:50px; }
-  section{ max-width:900px; margin:24px auto; background:#fff; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.08); padding:22px 30px; }
-  h2{ color:#1a5276; border-left:6px solid #1a5276; padding-left:10px; margin-top:18px; font-size: 35px;}
-  p{ margin:8px 0 14px 0; text-align:justify; font-size: 20px;}
-  code{ background:#ecf0f1; padding:2px 6px; border-radius:4px; }
-  .control{ text-align:center; margin-top:14px; display:flex; justify-content:center; gap:7px; flex-wrap:wrap; align-items:center; font-size: 25px; }
-  input, button { font-size:18px; padding:6px 10px; margin:4px; }
-  button{ background:#1a5276; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-  button:hover{ background:#2471a3; }
-  canvas{ display:block; margin:16px auto; border:2px solid #333; background:#fff; }
-  #info{ display:flex; justify-content:center; gap:14px; font-size:22px; margin-top:8px; flex-wrap:wrap; } 
-  #info p{ margin:0; font-size: 22px; }
+
+  section { 
+    max-width:900px; 
+    margin:25px auto; 
+    background: rgba(255, 255, 255, 0.92); 
+    border-radius:12px; 
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
+    padding:30px 40px; 
+  }
+
+  h2 { 
+    font-size:35px;
+    color:#1a5276; 
+    border-left:6px solid #1a5276; 
+    padding-left:15px; 
+    margin-top:20px; 
+    margin-bottom:20px; 
+  }
+
+  p { font-size: 20px; text-align:justify; }
+
+  .formula-box {
+    background: rgba(26, 82, 118, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #1a5276;
+    margin: 15px 0;
+    font-size: 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-style: italic;
+  }
+
+  .control-panel {
+    background: #fdfefe;
+    border: 1px solid #d5dbdb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .control { 
+    text-align:center; 
+    display:flex; 
+    justify-content:center; 
+    gap:10px; 
+    flex-wrap:wrap;
+  }
+  .control-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-container {
+    width: 100%;
+    margin-top: 15px;
+  }
+  
+  label { font-size: 22px; font-weight: bold; }
+  input, button { font-size:18px; padding:6px 10px; margin:4px; border-radius:4px; }
+  input { border: 1px solid #ccc; width: 80px; }
+  
+  button { 
+    background:#1a5276; 
+    color:#fff; 
+    border:none; 
+    cursor:pointer; 
+    transition: 0.3s;
+    padding: 8px 25px;
+  }
+  button:hover { background:#2471a3; transform: scale(1.05); }
+
+  canvas { 
+    display:block; 
+    margin:20px auto; 
+    border:2px solid #333; 
+    background:#fff; 
+    border-radius: 5px;
+  }
+
+  #info { 
+    display:flex; 
+    justify-content:center; 
+    gap:25px; 
+    margin-top:20px; 
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  } 
+  #info p { margin:0; font-size: 25px; font-weight: bold; }
+  #info span { color: #d35400; }
 </style>
 </head>
 <body>
+
+<nav>
+  <div class="menu">
+    <a href="index.html">首頁 (Home)</a>
+    <a href="Equilibrium & Elasticity.html" style="color:#f1c40f">平衡與彈性</a>
+    <a href="Mechanical Waves.html">機械波</a>
+    <a href="Projectile Motion.html">拋體運動</a>
+    <a href="Rotation of Rigid Bodies.html">圓周旋轉</a>
+    <a href="Sound & Hearing.html">聲音聽覺</a>
+  </div>
+</nav>
+
 <header>
   <h1>平衡與彈性（Equilibrium & Elasticity）</h1>
 </header>
@@ -29,14 +150,23 @@
 <section>
   <h2>定律內容</h2>
   <p>
-    靜力平衡（Equilibrium）表示物體受力與力矩加總為零。力矩（torque）定義為力與其作用線到支點的距離之乘積：<code>τ = F · r</code>。
+    靜力平衡（Equilibrium）表示物體受力與力矩加總為零。力矩（torque）定義為力與其作用線到支點的距離之乘積：
+  </p>
+  <div class="formula-box">
+    τ = F · r
+  </div>
+  <p>
     在翹翹板或天秤式的平衡問題中，左右兩側的力矩相等（Στ = 0）則系統平衡；否則會產生轉矩使桿子傾斜。
   </p>
 
+  
+
   <h2>公式表示</h2>
+  <div class="formula-box">
+    力矩（對支點）：τ = F · r = m · g · r（N·m）<br>
+    平衡條件：Στ_left = Στ_right（若相等則不轉動）
+  </div>
   <p>
-    力矩（對支點）：<code>τ = F · r = m · g · r</code>（N·m）<br>
-    平衡條件：<code>Στ_left = Στ_right</code>（若相等則不轉動）。<br>
     當存在力矩差時，桿子會產生角位移，其大小取決於力矩差與支撐剛度（本模擬以視覺化比例顯示）。
   </p>
 
@@ -47,7 +177,7 @@
 
   <h2>適用範圍</h2>
   <p>
-    適用於靜態或緩慢變化的剛體問題，忽略桿本身質量或將桿質量視為可單獨計算之參數。若桿有顯著彈性，則需考慮扭轉剛度（本模擬以簡化模型示意）。
+    適用於靜態或緩慢變化的剛體問題，忽略桿本身質量或將桿質量視為可單獨計算之參數。
   </p>
 
   <h2>常見應用</h2>
@@ -55,26 +185,38 @@
     天秤、翹翹板、橋梁負載分析、機械槓桿設計等，設計時需考慮力矩與支撐條件以確保結構或裝置保持穩定。
   </p>
 </section>
+
 <section>
   <h2>實驗模擬：力矩平衡</h2>
 
-  <div class="control">
-    <label>左質量 m₁ (kg)：<input type="number" id="m1" value="2.0" step="0.1"></label>
-    <label>左距離 r₁ (m)：<input type="number" id="r1" value="1.6" step="0.1"></label>
-    <label>右質量 m₂ (kg)：<input type="number" id="m2" value="1.0" step="0.1"></label>
-    <label>右距離 r₂ (m)：<input type="number" id="r2" value="10" step="0.1"></label>
-    <button onclick="apply()">開始</button>
-  </div>
-  <div id="info">
-      <p id="tau1">τ₁: 0 N·m</p>
-      <p id="tau2">τ₂: 0 N·m</p>
-      <p id="delta">Δτ: 0 N·m</p>
-      <p id="state">狀態: 平衡</p>
-    </div>
-  <canvas id="canvas" width="800" height="400"></canvas>
+  <div class="control-panel">
+    <div class="control">
+      <div class="control-group">
+        <label>左質量 m₁ (kg)：<input type="number" id="m1" value="2.0" step="0.1"></label>
+        <label>左距離 r₁ (m)：<input type="number" id="r1" value="1.6" step="0.1"></label>
+      </div>
+      
+      <div class="control-group">
+        <label>右質量 m₂ (kg)：<input type="number" id="m2" value="1.0" step="0.1"></label>
+        <label>右距離 r₂ (m)：<input type="number" id="r2" value="10" step="0.1"></label>
+      </div>
 
+      <div class="btn-container">
+        <button onclick="apply()">更新數據</button>
+      </div>
+    </div>
+
+    <div id="info">
+      <p>τ₁: <span id="tau1">0.00</span> N·m</p>
+      <p>τ₂: <span id="tau2">0.00</span> N·m</p>
+      <p>Δτ: <span id="delta">0.00</span> N·m</p>
+      <p><span id="state">狀態: 平衡</span></p>
+    </div>
+  </div>
   
+  <canvas id="canvas" width="800" height="400"></canvas>
 </section>
+
 <script>
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
@@ -88,6 +230,15 @@
   let angle=0,targetAngle=0;
   const maxAngle=Math.PI/10;
 
+  const m1Input=document.getElementById("m1");
+  const r1Input=document.getElementById("r1");
+  const m2Input=document.getElementById("m2");
+  const r2Input=document.getElementById("r2");
+  const tau1El=document.getElementById("tau1");
+  const tau2El=document.getElementById("tau2");
+  const deltaEl=document.getElementById("delta");
+  const stateEl=document.getElementById("state");
+
   function clamp(v,min,max){
     return Math.min(Math.max(v,min),max);
   }
@@ -98,25 +249,41 @@
     ctx.translate(canvas.width/2,canvas.height/2+40);
     ctx.rotate(angle);
 
-    ctx.fillStyle="#e1e4e8";
+    // 畫桿
+    ctx.fillStyle="#34495e";
     ctx.fillRect(-beamHalf,-10,beamHalf*2,20);
 
+    // 畫支點
     ctx.beginPath();
-    ctx.arc(0,0,6,0,2*Math.PI);
-    ctx.fillStyle="black";
+    ctx.arc(0,0,8,0,2*Math.PI);
+    ctx.fillStyle="#2c3e50";
     ctx.fill();
 
-    
+    // 畫左砝碼 (藍色)
     let lx=clamp(-r1*pxPerMeter,-beamHalf+20,-20);
-    ctx.fillStyle="blue";
-    ctx.fillRect(lx-15,-50,30,30);
+    ctx.fillStyle="#3498db";
+    ctx.fillRect(lx-15,-40,30,30);
+    ctx.fillStyle="white";
+    ctx.font="12px Arial";
+    ctx.fillText("m1", lx-8, -20);
 
-
+    // 畫右砝碼 (紅色)
     let rx=clamp(r2*pxPerMeter,20,beamHalf-20);
-    ctx.fillStyle="red";
-    ctx.fillRect(rx-15,-50,30,30);
+    ctx.fillStyle="#e74c3c";
+    ctx.fillRect(rx-15,-40,30,30);
+    ctx.fillStyle="white";
+    ctx.fillText("m2", rx-8, -20);
 
     ctx.restore();
+    
+    // 畫支架三角形
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2, canvas.height/2+50);
+    ctx.lineTo(canvas.width/2-20, canvas.height/2+100);
+    ctx.lineTo(canvas.width/2+20, canvas.height/2+100);
+    ctx.closePath();
+    ctx.fillStyle="#7f8c8d";
+    ctx.fill();
   }
 
   function apply(){
@@ -129,12 +296,12 @@
     let tau2=m2*g*r2;
     let delta=tau1-tau2;
 
-    tau1El.textContent=`τ₁: ${tau1.toFixed(2)}`;
-    tau2El.textContent=`τ₂: ${tau2.toFixed(2)}`;
-    deltaEl.textContent=`Δτ: ${delta.toFixed(2)}`;
+    tau1El.textContent=tau1.toFixed(2);
+    tau2El.textContent=tau2.toFixed(2);
+    deltaEl.textContent=delta.toFixed(2);
     stateEl.textContent=Math.abs(delta)<1?"狀態: 平衡":"狀態: 不平衡";
 
-    let norm=delta/(Math.abs(tau1)+Math.abs(tau2));
+    let norm=delta/(Math.abs(tau1)+Math.abs(tau2) + 0.1);
     targetAngle=clamp(-norm*maxAngle*angleScale,-maxAngle,maxAngle);
   }
 
@@ -143,16 +310,6 @@
     drawBeam();
     requestAnimationFrame(animate);
   }
-
-
-  const m1Input=document.getElementById("m1");
-  const r1Input=document.getElementById("r1");
-  const m2Input=document.getElementById("m2");
-  const r2Input=document.getElementById("r2");
-  const tau1El=document.getElementById("tau1");
-  const tau2El=document.getElementById("tau2");
-  const deltaEl=document.getElementById("delta");
-  const stateEl=document.getElementById("state");
 
   apply();
   animate();

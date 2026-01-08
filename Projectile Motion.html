@@ -1,276 +1,573 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>拋體運動 (Projectile Motion )</title>
-<style>
-  body { 
-    font-family:"Microsoft JhengHei",sans-serif; 
-    margin:0; padding:0; 
-    background: url('img/bb.webp') no-repeat center center fixed; 
-    background-size: cover;
-    color:#333; 
-    line-height:1.8; 
-  }
+    <meta charset="utf-8" />
+    <title>Projectile Motion</title>
+    <style>
+        :root {
+            --nav-bg: #2c3e50;
+            --theory-bg: rgba(255, 255, 255, 0.98);
+            --lab-bg: #2b323a; 
+            --accent-green: #51cf66; 
+            --accent-blue: #339af0;
+            --accent-orange: #ff922b;
+            --accent-yellow: #fcc419; 
+            --text-main: #343a40;
+        }
+        
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: url('img/bb.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  nav {
-    background: rgba(44, 62, 80);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  nav .menu a {
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-  nav .menu a:hover { color: #f1c40f; }
+        nav {
+            height: 60px; background: var(--nav-bg);
+            display: flex; align-items: center; padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100;
+        }
+        nav a { color: #dee2e6; text-decoration: none; margin-right: 25px; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        nav a:hover { color: var(--accent-green); }
+        nav a.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); }
 
-  header { 
-    background: rgba(52, 73, 94, 0.85); 
-    color:white; 
-    text-align:center; 
-  }
-  h1 { margin:0; font-size:50px; }
+        #main-container {
+            flex-grow: 1; display: flex; padding: 15px; gap: 15px;
+            height: calc(100vh - 60px);
+        }
 
-  section { 
-    max-width:900px; 
-    margin:25px auto; 
-    background: rgba(255, 255, 255, 0.92); 
-    border-radius:12px; 
-    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
-    padding:30px 40px; 
-  }
+        #theory-card {
+            width: 400px; background: var(--theory-bg);
+            border-radius: 12px; padding: 20px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
 
-  h2 { 
-    font-size:35px;
-    color:#1a5276; 
-    border-left:6px solid #1a5276; 
-    padding-left:15px; 
-    margin-top:20px; 
-    margin-bottom:20px; 
-  }
+        #experiment-card {
+            flex-grow: 1; background: var(--theory-bg);
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  p { font-size: 20px; }
+        #exp-header {
+            padding: 15px 20px; background: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 5% auto; padding: 20px;
+            border-radius: 12px; width: 80%; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--accent-green); pb: 10px;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd; padding: 12px; text-align: center;
+        }
+        th { background-color: var(--nav-bg); color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .close-btn { font-size: 28px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: #000; }
 
-  .formula-box {
-    background: rgba(26, 82, 118, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #1a5276;
-    margin: 15px 0;
-  }
+        #canvas-container {
+            flex-grow: 1; position: relative;
+            background: var(--lab-bg); margin: 10px;
+            border-radius: 8px; border: 1px solid #454d55; overflow: hidden;
+        }
 
-  .control-panel {
-    background: #fdfefe;
-    border: 1px solid #d5dbdb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  canvas { 
-    border:2px solid #333; 
-    background:#fff; 
-    display:block; 
-    margin:20px auto; 
-    border-radius: 5px;
-  }
+        canvas { width: 100%; height: 100%; display: block; }
 
-  input, button { font-size:16px; padding:5px 8px; margin:5px; }
-  button { 
-    background:#1a5276; 
-    color:white; 
-    border:none; 
-    cursor:pointer; 
-    border-radius:4px; 
-    padding: 8px 20px;
-    font-size: 18px;
-  }
-  button:hover { background:#2471a3; }
+        #telemetry {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(33, 37, 41, 0.85); color: var(--accent-yellow);
+            padding: 10px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 15px; border-left: 4px solid var(--accent-green);
+            pointer-events: none;
+        }
 
-  label { font-size: 25px; font-weight: bold; }
-  
-  #info { 
-    display: flex; 
-    justify-content: center; 
-    gap: 30px; 
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-    margin-top: 15px;
-  }
-  #info p { font-size: 25px; margin: 5px; font-weight: bold; }
-  /* 數據顏色設為橘色方便辨識 */
-  #info span { color: #d35400; }
-</style>
+        h1 { font-size: 40px; color: var(--text-main); margin: 0 0 0 0; border-bottom: 3px solid var(--accent-green); padding-bottom: 5px; }
+        h2 { font-size: 20px; color: #1a5276; margin-top: 20px; border-left: 5px solid #1a5276; padding-left: 10px; }
+        p { color: #444; line-height: 1.6; font-size: 16px; text-align: justify; }
+        .formula-box { background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 13px; border: 1px solid #e9ecef; margin-top: 5px; }
+        
+        .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .slider-label { font-size: 12px; font-weight: bold; color: #555; }
+        input[type="range"] { width: 110px; cursor: pointer; }
+        
+        button { 
+            background: var(--accent-green); color: white; border: none; padding: 10px 22px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        button:hover { background: #40c057; }
+        .btn-reset { background: #adb5bd; }
+        .btn-reset:hover { background: #868e96; }
+    </style>
 </head>
 <body>
 
+
 <nav>
-  <div class="menu">
-    <a href="index.html">首頁 (Home)</a>
-    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
-    <a href="Mechanical Waves.html">機械波</a>
-    <a href="Projectile Motion.html" style="color:#f1c40f">拋體運動</a>
-    <a href="Rotation of Rigid Bodies.html">圓周與旋轉</a>
-    <a href="Sound & Hearing.html">聲音與聽覺</a>
-  </div>
+    <a href="index.html">Home</a>
+    <a href="Projectile Motion.html" class="active">Projectile Motion</a>
+    <a href="Mechanical Waves.html">Mechanical Waves</a>
+    <a href="Rotation of Rigid Bodies.html">Rotation of Rigid Bodies</a>
+    <a href="Equilibrium & Elasticity.html" >Equilibrium & Elasticity</a>
+    <a href="Sound & Hearing.html">Sound & Hearing</a>
 </nav>
 
-<header>
-  <h1>拋體運動（Projectile Motion）</h1>
-</header>
+<div id="main-container">
+    <div id="theory-card">
+        <h1>拋體運動</h1>
+        <h2>定律內容</h2>
+        <p>拋體運動是物體以初速度 v₀ 與水平面成角 θ 被拋出後，只受重力影響的運動。水平方向勻速，垂直方向受重力影響，形成拋物線軌跡。</p>
 
-<section>
-  <h2>定律內容</h2>
-  <p>拋體運動是物體以初速度 v₀ 與水平面成角 θ 被拋出後，只受重力影響的運動。水平方向勻速，垂直方向受重力影響，形成拋物線軌跡。</p>
+        <h2>公式表示</h2>
+        <div class="formula-box">
+            <b>速度分量：</b><br>
+            vₓ = v₀ cosθ<br>
+            vᵧ = v₀ sinθ - g t
+        </div>
+        <div class="formula-box">
+            <b>位移方程：</b><br>
+            x = v₀ cosθ · t<br>
+            y = v₀ sinθ · t - ½ g t²
+        </div>
+        <div class="formula-box">
+            <b>關鍵數據：</b><br>
+            最大高度：hₘₐₓ = (v₀² sin²θ)/(2g)<br>
+            飛行時間：T = (2v₀ sinθ)/g<br>
+            水平射程：R = (v₀² sin(2θ))/g
+        </div>
 
-  <h2>公式表示</h2>
-  <div class="formula-box">
-    <p style="margin:0;">
-      水平速度：vₓ = v₀ cosθ<br>
-      垂直速度：vᵧ = v₀ sinθ - g t<br>
-      位移：x = v₀ cosθ · t，y = v₀ sinθ · t - ½ g t²<br>
-      最大高度：hₘₐₓ = (v₀² sin²θ)/(2g)<br>
-      飛行時間：T = (2v₀ sinθ)/g<br>
-      水平射程：R = (v₀² sin(2θ))/g
-    </p>
-  </div>
-  
-  
+        <h2>圖像理解</h2>
+        <p>軌跡是一條對稱的拋物線。物體先上升至最高點（此時速度的垂直分量 vᵧ 為 0），隨後在重力加速度作用下下降至地面。在忽略空氣阻力的情況下，其形狀完全由初速度大小與拋射角度決定。</p>
 
-  <h2>圖像理解</h2>
-  <p>軌跡是一條對稱的拋物線。物體先上升至最高點，速度垂直分量為0，再下降至地面。忽略空氣阻力時，形狀由初速度與角度決定。</p>
+        <h2>適用範圍</h2>
+        <p>本實驗模型適用於<b>忽略空氣阻力</b>且的情況。並不適用於超高速（空氣阻力大）或極高空（重力隨高度變化）的拋射場景。</p>
 
-  <h2>適用範圍</h2>
-  <p>適用於忽略空氣阻力、重力加速度恆定的情況。不適用於高速或高空拋射，因為空氣阻力與重力變化不可忽略。</p>
+        <h2>常見應用</h2>
+        <p>此物理模型廣泛應用於：<br>
+            1. 運動科學（如籃球投籃、足球開球）。<br>
+            3. 彈道學研究與工程拋射設計。
+        </p>
 
-  <h2>常見應用</h2>
-  <p>廣泛應用於運動科學（籃球、足球射門）、物理模擬遊戲、彈道學及工程拋射設計等領域。</p>
-</section>
+        <h2>實驗探究任務</h2>
+        <div class="formula-box" style="border-left: 4px solid var(--accent-blue);">
+            1. <b>尋找最佳角度：</b>初速固定 60 m/s，哪個角度射程最遠？<br>
+            2. <b>重力影響：</b>在木星發射與月球發射，飛行時間相差幾倍？<br>
+            3. <b>初速倍增：</b>初速增加一倍，最大高度會增加幾倍？
+        </div>
 
-<section> 
-  <h2>模擬實驗：拋體運動</h2>
-  <div class="control-panel">
-    <div class="control">
-      <label>初速度 (m/s)：<input id="velocity" type="number" value="40"></label>
-      <label>發射角度 (°)：<input id="angle" type="number" value="45"></label>
-      <button onclick="startSimulation()">開始</button>
+        <h2>隨堂測驗</h2>
+        <div id="quiz-area" style="font-size: 14px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <p><b>Q1: 在最高點時，球的垂直速度 (Vy) 是多少？</b></p>
+            <button onclick="checkQuiz(this, false)" style="padding:5px; font-size:12px; background:#666;">等於初速</button>
+            <button onclick="checkQuiz(this, true)" style="padding:5px; font-size:12px; background:#666;">0 m/s</button>
+            <button onclick="checkQuiz(this, false)" style="padding:5px; font-size:12px; background:#666;">最大值</button>
+            <p id="quiz-feedback" style="margin-top:10px; color: var(--accent-orange); font-weight:bold;"></p>
+        </div>
     </div>
-    <div id="info">
-        <p>水平距離: <span id="dist">0.00</span> m</p>
-        <p>高度: <span id="height">0.00</span> m</p>
-        <p>飛行時間: <span id="time">0.00</span> s</p>
-    </div>
-  </div>
-  <canvas id="canvas" width="900" height="500"></canvas>
-</section>
 
+    <div id="experiment-card">
+      <div id="exp-header">
+          <div class="control-group">
+              <span class="slider-label">初速 v₀: <span id="v0Disp">80</span> m/s</span>
+              <input type="range" id="v0" min="10" max="150" value="80" oninput="v0Disp.innerText=this.value; if(!running) resetDraw();">
+          </div>
+          <div class="control-group">
+              <span class="slider-label">角度 θ: <span id="thetaDisp">45</span>°</span>
+              <input type="range" id="theta" min="0" max="90" value="45" oninput="thetaDisp.innerText=this.value; if(!running) resetDraw();">
+          </div>
+          <div class="control-group">
+              <span class="slider-label">發射高度 h: <span id="hDisp">0</span> m</span>
+              <input type="range" id="y0" min="0" max="1000" value="0" oninput="hDisp.innerText=this.value; if(!running) resetDraw();">
+          </div>
+          <div class="control-group">
+              <span class="slider-label">環境 (g)</span>
+              <select id="gravity" onchange="clearAll()">
+                  <option value="9.8">地球(9.8)</option>
+                  <option value="1.62">月球(1.62)</option>
+                  <option value="24.8">木星(24.8)</option>
+              </select>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: #555; border-left: 1px solid #ddd; padding-left: 10px;">
+            <label><input type="checkbox" id="showV" checked onchange="syncUI();"> 總速度向量</label>
+            <label><input type="checkbox" id="showVectorVal" checked onchange="syncUI();"> 向量數值</label>
+            <label><input type="checkbox" id="showAdvanced" onchange="toggleAdvanced();"> 進階數據</label>
+            <label><input type="checkbox" id="showPeakMark" checked onchange="resetDraw();"> 最高點標記</label> 
+          </div>
+          <div id="recordModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 style="margin:0;">📔 實驗紀錄簿 (跨場景數據)</h2>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <button onclick="clearRecordsOnly()" style="background: #fa5252; padding: 5px 15px; font-size: 13px;">清除所有紀錄</button>
+                        <span class="close-btn" onclick="closeModal()">&times;</span>
+                    </div>
+                </div>
+                <table id="recordTable">
+                    <thead>
+                        <tr>
+                            <th>場景</th>
+                            <th>初速 (m/s)</th>
+                            <th>角度 (°)</th>
+                            <th>高度 (m)</th>
+                            <th>飛行時間 (s)</th>
+                            <th>水平距離 (m)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordBody"></tbody>
+                </table>
+            </div>
+          </div>
+            <button onclick="launch()">啟動拋射</button>
+            <button class="btn-reset" onclick="clearAll()" style="background:#fa5252;">清除</button>
+            <button onclick="openModal()" style="background: var(--accent-blue);">紀錄簿</button>
+      </div>
+
+      <div id="canvas-container" style="position:relative; cursor: grab;">
+          <div id="telemetry">
+              <span style="color:#adb5bd; font-size:11px;">實時數據看板</span><br>
+              飛行時間: <span id="tDisp">0.00</span> s<br>
+              水平距離: <span id="xDisp">0.00</span> m<br>
+              目前高度: <span id="yDisp">0.00</span> m
+              
+              <div id="v-data" style="border-top: 1px solid #444; margin-top:5px; padding-top:5px;">
+                  <div id="row-total-v" style="display:block;">總速度: <span id="vTotalDisp">0.00</span> m/s</div>
+                  <div id="row-comp-v" style="display:block;">
+                      <span style="color:#339af0">vx</span>: <span id="vxDisp">0.00</span> | <span style="color:#ff922b">vy</span>: <span id="vyDisp">0.00</span>
+                  </div>
+              </div>
+
+              <div id="advanced-stats" style="display: none;">
+                  <hr style="border:0; border-top:1px solid #444; margin:5px 0;">
+                  最高高度: <span id="hMaxDisp">0.00</span> m<br>
+                  最高速度: <span id="vMaxDisp">0.00</span> m/s
+              </div>
+          </div>
+          
+          <div id="log-panel" style="display:none; position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.85); color:white; padding:10px; border-radius:5px; font-size:11px; max-height:120px; overflow-y:auto; width:220px; border:1px solid #555; z-index:100;">
+              <b>📋 實驗紀錄表</b>
+              <div id="log-content"></div>
+          </div>
+          <canvas id="simCanvas"></canvas>
+      </div>
+  </div>
+</div>
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const g = 9.8;  
-const scale = 5; 
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let running = false, t = 0;
+    let currentPath = []; 
+    let allPaths = [];    
+    let landingDots = []; 
+    let experimentRecords = []; 
+    let peakMarker = null;      
+    let hMax = 0, vMax = 0;
 
-let x = 0, y = 0;
-let v0 = 0, angle = 0;
-let trajectory = [];
-let animating = false;
-let startTime = null;
+    let scale = 2.0;
+    let offsetX = 50, offsetY = 0;  
+    let isDragging = false, lastMouseX, lastMouseY;
 
-// 取得顯示數據的元素
-const distEl = document.getElementById("dist");
-const heightEl = document.getElementById("height");
-const timeEl = document.getElementById("time");
-
-function startSimulation() {
-  if(animating) return; 
-  
-  v0 = parseFloat(document.getElementById("velocity").value);
-  angle = parseFloat(document.getElementById("angle").value) * Math.PI / 180;
-  
-  // 重置數據
-  x = 0; y = 0;
-  trajectory = [];
-  animating = true;
-  startTime = null;
-  requestAnimationFrame(animate);
-}
-
-function animate(timestamp) {
-  if(!animating) return;
-  if (!startTime) startTime = timestamp;  
-  
-  let t = (timestamp - startTime) / 1000; 
-  
-  let vx = v0 * Math.cos(angle);
-  let vy = v0 * Math.sin(angle);
-  
-  x = vx * t;
-  y = vy * t - 0.5 * g * t * t;
-  
-  // 更新畫面上顯示的數值
-  timeEl.innerText = t.toFixed(2);
-  distEl.innerText = x.toFixed(2);
-  heightEl.innerText = Math.max(y, 0).toFixed(2); 
-  
-  // 落地判斷
-  if(y < 0) { 
-    animating = false; 
-    y = 0; 
-    // 落地瞬間數值微調回理論值
-    const finalT = (2 * v0 * Math.sin(angle)) / g;
-    timeEl.innerText = finalT.toFixed(2);
-    distEl.innerText = (vx * finalT).toFixed(2);
-    heightEl.innerText = "0.00";
-  }
-  
-  trajectory.push({x, y});
-  draw();
-  
-  if(animating) requestAnimationFrame(animate);
-}
-
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  
-  // 畫路徑
-  if(trajectory.length > 1){
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(230,126,34,0.7)";
-    ctx.lineWidth = 3;
-    ctx.moveTo(trajectory[0].x*scale, canvas.height - trajectory[0].y*scale);
-    for(let p of trajectory){
-      ctx.lineTo(p.x*scale, canvas.height - p.y*scale);
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        offsetY = canvas.height - 50;
+        resetDraw();
     }
-    ctx.stroke();
-  }
-  
-  // 畫拋體物
-  ctx.beginPath();
-  ctx.arc(x*scale, canvas.height - y*scale, 8, 0, 2*Math.PI);
-  ctx.fillStyle = "red";
-  ctx.fill();
-  
-  // 畫地平線
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height);
-  ctx.lineTo(canvas.width, canvas.height);
-  ctx.strokeStyle = "#333";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
 
-draw();
+    function syncUI() {
+        const showV = document.getElementById('showV').checked;
+        const showVec = document.getElementById('showVectorVal').checked;
+        document.getElementById('row-total-v').style.display = showV ? 'block' : 'none';
+        document.getElementById('row-comp-v').style.display = showVec ? 'block' : 'none';
+        if (!running) resetDraw();
+    }
+
+    function toggleAdvanced() {
+        document.getElementById('advanced-stats').style.display = document.getElementById('showAdvanced').checked ? 'block' : 'none';
+    }
+
+    function openModal() {
+        const tbody = document.getElementById('recordBody');
+        if (tbody) {
+            tbody.innerHTML = experimentRecords.map(r => `
+                <tr>
+                    <td>${r.scene}</td>
+                    <td>${r.v0}</td>
+                    <td>${r.theta}°</td>
+                    <td>${r.h0}m</td>
+                    <td>${r.time}s</td>
+                    <td><b style="color:#2b8a3e">${r.range}m</b></td>
+                </tr>
+            `).join('');
+        }
+        document.getElementById('recordModal').style.display = "block";
+    }
+
+    function closeModal() { document.getElementById('recordModal').style.display = "none"; }
+
+    function checkQuiz(btn, isCorrect) {
+        const feedback = document.getElementById('quiz-feedback');
+        if(isCorrect) {
+            feedback.innerText = "✅ 正確！最高點垂直速度消失，僅剩水平速度。";
+            btn.style.background = "var(--accent-green)";
+        } else {
+            feedback.innerText = "❌ 再想想！提示：球在最高點時會「瞬間停止上升」。";
+            btn.style.background = "#fa5252";
+        }
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mX = e.clientX - rect.left;
+        const mY = e.clientY - rect.top;
+
+        const s = scale;
+        const ballX = offsetX;
+        const ballY = offsetY - parseFloat(document.getElementById('y0').value) * s;
+        const dist = Math.sqrt((mX - ballX)**2 + (mY - ballY)**2);
+
+        if (dist < 20 && !running) {
+            isDraggingBall = true; 
+            canvas.style.cursor = 'ns-resize';
+        } else {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        }
+    });
+
+    let isDraggingBall = false; 
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingBall) {
+            const rect = canvas.getBoundingClientRect();
+            const mY = e.clientY - rect.top;
+            let newH = (offsetY - mY) / scale;
+            newH = Math.max(0, Math.min(150, newH));
+            document.getElementById('y0').value = newH;
+            document.getElementById('hDisp').innerText = Math.round(newH);
+            resetDraw();
+            return;
+        }
+        
+        if (!isDragging) return;
+        offsetX += e.clientX - lastMouseX;
+        offsetY += e.clientY - lastMouseY;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        if (!running) resetDraw();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        isDraggingBall = false;
+        canvas.style.cursor = 'grab';
+    });
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const oldScale = scale;
+        const zoomSpeed = 0.15;
+        scale = Math.min(Math.max(0.1, scale + (e.deltaY > 0 ? -zoomSpeed : zoomSpeed)), 15);
+
+        const rect = canvas.getBoundingClientRect();
+        const mX = e.clientX - rect.left; 
+        const mY = e.clientY - rect.top;
+        
+        offsetX = mX - (mX - offsetX) * (scale / oldScale);
+        offsetY = mY - (mY - offsetY) * (scale / oldScale);
+        if (!running) resetDraw();
+    }, { passive: false });
+
+    function launch() {
+        if(running) return;
+        if(currentPath.length > 0) {
+            allPaths.push({ pts: [...currentPath], color: 'rgba(255, 255, 255, 0.15)', peak: peakMarker ? {...peakMarker} : null });
+        }
+        currentPath = []; t = 0; peakMarker = null;
+        const v0 = parseFloat(document.getElementById('v0').value);
+        const theta = parseFloat(document.getElementById('theta').value) * Math.PI / 180;
+        const y0 = parseFloat(document.getElementById('y0').value);
+        const g = parseFloat(document.getElementById('gravity').value);
+        hMax = y0; vMax = v0;
+        
+        if(allPaths.length === 0) {
+            const tFlight = (v0 * Math.sin(theta) + Math.sqrt(Math.pow(v0 * Math.sin(theta), 2) + 2 * g * y0)) / g;
+            scale = (canvas.width * 0.45) / Math.max(v0 * Math.cos(theta) * tFlight, 40);
+            offsetX = 50; offsetY = canvas.height - 50;
+        }
+        running = true;
+        animate();
+    }
+
+    function animate() {
+        if(!running) return;
+        const v0 = parseFloat(document.getElementById('v0').value);
+        const theta = parseFloat(document.getElementById('theta').value) * Math.PI / 180;
+        const g = parseFloat(document.getElementById('gravity').value);
+        const y0 = parseFloat(document.getElementById('y0').value);
+
+        t += 0.04;
+        const vx = v0 * Math.cos(theta);
+        const vy = v0 * Math.sin(theta) - g * t;
+        const x = vx * t;
+        const y = y0 + (v0 * Math.sin(theta) * t - 0.5 * g * t * t);
+        const cv = Math.sqrt(vx*vx + vy*vy);
+        
+        if (vy <= 0 && peakMarker === null) peakMarker = { x, y };
+        if (y > hMax) hMax = y;
+        if (cv > vMax) vMax = cv;
+
+        if(y < 0) { 
+            running = false; 
+            landingDots.push({x: x, y: 0});
+
+            const gName = g == 9.8 ? "地球" : (g == 1.62 ? "月球" : "木星");
+            experimentRecords.push({ 
+                scene: gName, 
+                v0, 
+                theta: document.getElementById('theta').value, 
+                h0: y0, 
+                time: t.toFixed(2), 
+                range: x.toFixed(2) 
+            });
+            const entry = document.createElement('div');
+            entry.innerHTML = `🚀 θ:${document.getElementById('theta').value}° | R:<b>${x.toFixed(1)}m</b>`;
+            const logContent = document.getElementById('log-content');
+            if (logContent) logContent.prepend(entry);
+            
+            return; 
+        }
+
+        currentPath.push({x, y});
+        if (x * scale + offsetX > canvas.width * 0.7) offsetX = canvas.width * 0.7 - x * scale;
+
+        updateUI(t, x, y, hMax, vMax, vx, vy, cv);
+        draw(x, y, vx, vy, g, cv);
+        requestAnimationFrame(animate);
+    }
+
+    function clearAll() {
+        running = false; 
+        t = 0;
+        currentPath = []; 
+        allPaths = []; 
+        landingDots = []; 
+        peakMarker = null;
+        hMax = 0; 
+        vMax = 0;
+
+        offsetX = 50; 
+        offsetY = canvas.height - 50; 
+        scale = 2.0;
+
+        updateUI(0, 0, 0, 0, 0, 0, 0, 0);
+        resetDraw();
+    }
+    function clearRecordsOnly() {
+        if (confirm("確定要刪除所有實驗紀錄嗎？此動作無法復原。")) {
+            experimentRecords = [];
+            const tbody = document.getElementById('recordBody');
+            if (tbody) tbody.innerHTML = "";
+            const logContent = document.getElementById('log-content');
+            if (logContent) logContent.innerHTML = "";
+        }
+    }
+
+    function resetDraw() {
+        const y0 = parseFloat(document.getElementById('y0').value);
+        const v0 = parseFloat(document.getElementById('v0').value);
+        const theta = parseFloat(document.getElementById('theta').value) * Math.PI / 180;
+        const g = parseFloat(document.getElementById('gravity').value);
+        draw(0, y0, v0 * Math.cos(theta), v0 * Math.sin(theta), g, v0);
+    }
+
+    function updateUI(currT, x, y, hM, vM, vx, vy, vt) {
+        document.getElementById('tDisp').innerText = currT.toFixed(2);
+        document.getElementById('xDisp').innerText = x.toFixed(2);
+        document.getElementById('yDisp').innerText = Math.max(0, y).toFixed(2);
+        document.getElementById('hMaxDisp').innerText = hM.toFixed(2);
+        document.getElementById('vMaxDisp').innerText = vM.toFixed(2);
+        document.getElementById('vTotalDisp').innerText = vt.toFixed(2);
+        document.getElementById('vxDisp').innerText = vx.toFixed(2);
+        document.getElementById('vyDisp').innerText = vy.toFixed(2);
+    }
+
+    function draw(curX, curY, vx, vy, g, cv) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const s = scale;
+        const showPeak = document.getElementById('showPeakMark').checked;
+
+        drawGridAndAxes();
+
+        allPaths.forEach(p => { 
+            ctx.strokeStyle = p.color; ctx.lineWidth = 1; ctx.beginPath();
+            p.pts.forEach((pt, i) => { if(i===0) ctx.moveTo(offsetX + pt.x*s, offsetY - pt.y*s); else ctx.lineTo(offsetX + pt.x*s, offsetY - pt.y*s); });
+            ctx.stroke();
+            if (showPeak && p.peak) drawPeak(p.peak.x, p.peak.y, 'rgba(252, 196, 25, 0.2)');
+        });
+        
+        landingDots.forEach(dot => {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.beginPath(); ctx.arc(offsetX + dot.x * s, offsetY - dot.y * s, 6, 0, Math.PI*2); ctx.fill();
+        });
+
+        if (showPeak && peakMarker) drawPeak(peakMarker.x, peakMarker.y, '#fcc419');
+
+        ctx.strokeStyle = '#51cf66'; ctx.lineWidth = 3;
+        ctx.beginPath(); currentPath.forEach((pt, i) => { if(i===0) ctx.moveTo(offsetX + pt.x*s, offsetY - pt.y*s); else ctx.lineTo(offsetX + pt.x*s, offsetY - pt.y*s); }); ctx.stroke();
+
+        const sX = offsetX + curX * s; const sY = offsetY - curY * s;
+        if(running || curX === 0) {
+            ctx.fillStyle = '#fff'; ctx.shadowBlur = 10; ctx.shadowColor = '#51cf66';
+            ctx.beginPath(); ctx.arc(sX, sY, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function drawPeak(x, y, color) {
+        const px = offsetX + x * scale; const py = offsetY - y * scale;
+        ctx.strokeStyle = color; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(px-6, py-6); ctx.lineTo(px+6, py+6); ctx.moveTo(px+6, py-6); ctx.lineTo(px-6, py+6); ctx.stroke();
+    }
+
+    function drawGridAndAxes() {
+        const s = scale;
+        ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 0.5; ctx.beginPath();
+        let gridGap = 50 * s; while (gridGap < 60) gridGap *= 2;
+        for(let i = offsetX % gridGap; i < canvas.width; i += gridGap) { ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); }
+        for(let j = offsetY % gridGap; j < canvas.height; j += gridGap) { ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); }
+        ctx.stroke();
+        ctx.strokeStyle = '#999'; ctx.lineWidth = 2.5; ctx.beginPath();
+        ctx.moveTo(0, offsetY); ctx.lineTo(canvas.width, offsetY); ctx.moveTo(offsetX, 0); ctx.lineTo(offsetX, canvas.height); ctx.stroke();
+        ctx.fillStyle = '#bbb'; ctx.font = "bold 14px Consolas, Arial"; ctx.textAlign = "center";
+        let xStep = gridGap / s;
+        for (let m = Math.floor(-offsetX/gridGap)*xStep; m < (canvas.width-offsetX)/s + xStep; m += xStep) {
+            let px = offsetX + m * s; if(px >= 0 && px <= canvas.width) ctx.fillText(Math.round(m) + "m", px, offsetY + 25);
+        }
+        ctx.textAlign = "right";
+        for (let h = Math.floor((offsetY-canvas.height)/gridGap)*xStep; h < offsetY/s + xStep; h += xStep) {
+            let py = offsetY - h * s; if(py >= 0 && py <= canvas.height) ctx.fillText(Math.round(h) + "m", offsetX - 15, py + 5);
+        }
+    }
+
+    window.addEventListener('resize', resize);
+    window.onclick = function(e) { if(e.target == document.getElementById('recordModal')) closeModal(); };
+    resize();
 </script>
-
 </body>
 </html>

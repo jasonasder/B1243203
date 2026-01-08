@@ -1,360 +1,682 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>圓周運動（Rotation of Rigid Bodies）</title>
-<style>
-  body { 
-    font-family: "Microsoft JhengHei", sans-serif; 
-    margin:0; padding:0; 
-    background: url('img/bb.webp') no-repeat center center fixed; 
-    background-size: cover;
-    color:#333; 
-    line-height:1.8; 
-  }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Rotation of Rigid Bodies</title>
+    <style>
+        :root {
+            --nav-bg: #2c3e50;
+            --theory-bg: rgba(255, 255, 255, 0.98);
+            --lab-bg: #2b323a;
+            --accent-green: #51cf66; 
+            --accent-orange: #ff922b; 
+            --accent-purple: #cc5de8; 
+            --accent-blue: #339af0;
+            --accent-red: #fa5252;
+            --text-main: #343a40;
+        }
+        
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: url('img/bb.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  nav {
-    background: rgba(44, 62, 80);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  nav .menu a {
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-  nav .menu a:hover { color: #f1c40f; }
+        nav {
+            height: 60px; background: var(--nav-bg);
+            display: flex; align-items: center; padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100;
+        }
+        nav a { color: #dee2e6; text-decoration: none; margin-right: 25px; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        nav a:hover { color: var(--accent-green); }
+        nav a.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); }
 
-  header { 
-    background: rgba(52, 73, 94, 0.85); 
-    color:white; 
-    text-align:center; 
-    padding:10px 10px; 
-  }
-  h1 { margin:0; font-size:50px; }
+        #main-container {
+            flex-grow: 1; display: flex; padding: 15px; gap: 15px;
+            height: calc(100vh - 60px);
+        }
 
-  section{ 
-    max-width:900px; 
-    margin:25px auto; 
-    background: rgba(255, 255, 255, 0.92); 
-    border-radius:12px; 
-    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
-    padding:30px 40px; 
-  }
+        #theory-card {
+            width: 400px; background: var(--theory-bg);
+            border-radius: 12px; padding: 20px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
 
-  h2{ 
-    color:#1a5276; 
-    border-left:6px solid #1a5276; 
-    padding-left:15px; 
-    margin-top:18px; 
-    font-size: 35px;
-  }
-  p{ font-size: 20px; text-align:justify; }
+        #experiment-card {
+            flex-grow: 1; background: var(--theory-bg);
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  .formula-box {
-    background: rgba(26, 82, 118, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #1a5276;
-    margin: 15px 0;
-    font-family: "Times New Roman", Times, serif;
-  }
+        .mode-tabs {
+            display: flex; background: #e9ecef; border-bottom: 1px solid #dee2e6;
+            border-radius: 12px 12px 0 0; overflow: hidden;
+        }
+        .mode-tab {
+            flex: 1; padding: 15px; text-align: center; cursor: pointer;
+            font-weight: bold; color: #666; transition: 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .mode-tab:hover { background: #dee2e6; }
+        .mode-tab.active {
+            background: #fff; color: var(--accent-blue);
+            border-bottom: 3px solid var(--accent-blue);
+        }
+        .mode-tab.active.safety { color: var(--accent-red); border-bottom-color: var(--accent-red); }
 
-  .control-panel {
-    background: #fdfefe;
-    border: 1px solid #d5dbdb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
+        #exp-header {
+            padding: 15px 20px; background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
 
-  .control { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 15px; 
-  }
-  .control-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+        select {
+            appearance: none; background-color: #fff; border: 1px solid #ced4da;
+            border-radius: 6px; padding: 6px 30px 6px 12px; font-size: 14px;
+            color: #495057; cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 8px center; background-size: 14px;
+        }
+        select:focus { outline: none; border-color: var(--accent-blue); }
 
-  label { font-size: 22px; font-weight: bold; }
-  input, select { font-size:16px; padding:6px; width: 80px; border-radius:4px; border:1px solid #ccc; }
-  select { width: 120px; }
-  
-  button { 
-    background:#1a5276; 
-    color:#fff; 
-    border:none; 
-    border-radius:5px; 
-    cursor:pointer; 
-    padding: 8px 20px;
-    font-size: 18px;
-    transition: 0.3s;
-  }
-  button:hover { background:#2471a3; transform: scale(1.05); }
+        .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-right: 15px; }
+        .slider-label { font-size: 12px; font-weight: bold; color: #555; }
+        input[type="range"] { width: 110px; cursor: pointer; height: 6px; border-radius: 3px; background: #dee2e6; outline: none; appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; transition: 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 10% auto; padding: 25px;
+            border-radius: 12px; width: 60%; max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: slideIn 0.3s;
+        }
+        @keyframes slideIn { from {transform: translateY(-50px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+        
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px;
+        }
+        .modal-title { font-size: 24px; font-weight: bold; color: var(--text-main); }
+        
+        #success-toast {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(40, 40, 40, 0.95); color: white;
+            padding: 20px 40px; border-radius: 10px; text-align: center;
+            display: none; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeInOut 1.5s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            15% { opacity: 1; transform: translate(-50%, -50%); }
+            85% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -60%); }
+        }
+        .checkmark { font-size: 40px; color: var(--accent-green); display: block; margin-bottom: 10px; }
 
-  #info { 
-    display:flex; 
-    justify-content:center; 
-    gap:20px; 
-    margin-top:15px; 
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-    flex-wrap: wrap;
-  }
-  #info p { font-size: 22px; font-weight: bold; margin: 5px; }
-  #info strong { color: #d35400; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: var(--nav-bg); color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .close-btn { font-size: 28px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: #000; }
 
-  canvas{ 
-    display:block; 
-    margin:20px auto; 
-    border:2px solid #333; 
-    background:#fff; 
-    border-radius: 5px;
-  }
-</style>
+        #canvas-container {
+            flex-grow: 1; position: relative;
+            background: var(--lab-bg); margin: 10px;
+            border-radius: 8px; border: 1px solid #454d55; overflow: hidden;
+            cursor: default;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+
+        #telemetry {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(33, 37, 41, 0.9); 
+            color: #ecf0f1; 
+            padding: 15px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 14px; border-left: 4px solid var(--accent-purple);
+            pointer-events: none;
+            min-width: 220px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #hint-msg {
+            position: absolute; bottom: 20px; left: 20px;
+            color: rgba(255,255,255,0.7); font-size: 14px;
+            pointer-events: none;
+        }
+
+        h1 { font-size: 40px; color: var(--text-main); margin: 0 0 10px 0; border-bottom: 3px solid var(--accent-purple); padding-bottom: 5px; }
+        h2 { font-size: 20px; color: #1a5276; margin-top: 20px; border-left: 5px solid #1a5276; padding-left: 10px; }
+        p { color: #444; line-height: 1.6; font-size: 16px; text-align: justify; margin: 5px 0; }
+        
+        .formula-box { 
+            background: #f8f9fa; padding: 12px; border-radius: 6px; 
+            font-size: 15px; border: 1px solid #e9ecef; margin-top: 8px; 
+            font-family: "Times New Roman", serif; line-height: 1.6;
+        }
+
+        button { 
+            background: var(--accent-blue); color: white; border: none; padding: 8px 18px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;
+        }
+        button:hover { background: #228be6; transform: translateY(-2px); }
+        .btn-record { background: var(--accent-green); }
+        .btn-record:hover { background: #40c057; }
+        .btn-reset { background: #868e96; }
+        .btn-reset:hover { background: #495057; }
+
+        .hidden { display: none !important; }
+
+        #quiz-area button { width: 100%; margin: 5px 0; text-align: left; background: #e9ecef; color: #333; }
+        #quiz-area button:hover { background: #dee2e6; transform: none; }
+    </style>
 </head>
 <body>
 
 <nav>
-  <div class="menu">
-    <a href="index.html">首頁 (Home)</a>
-    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
-    <a href="Mechanical Waves.html">機械波</a>
-    <a href="Projectile Motion.html">拋體運動</a>
-    <a href="Rotation of Rigid Bodies.html" style="color:#f1c40f">圓周旋轉</a>
-    <a href="Sound & Hearing.html">聲音聽覺</a>
-  </div>
+    <a href="index.html">Home</a>
+    <a href="Projectile Motion.html">Projectile Motion</a>
+    <a href="Mechanical Waves.html">Mechanical Waves</a>
+    <a href="Rotation of Rigid Bodies.html" class="active">Rotation of Rigid Bodies</a>
+    <a href="Equilibrium & Elasticity.html" >Equilibrium & Elasticity</a>
+    <a href="Sound & Hearing.html">Sound & Hearing</a>
 </nav>
 
-<header><h1>圓周運動（Rotation of Rigid Bodies）</h1></header>
+<div id="main-container">
+    <div id="theory-card">
+        <h1>圓周運動</h1>
+        
+        <h2>定律內容</h2>
+        <p>勻速圓周運動（Uniform Circular Motion）指物體以恆定的速率，沿著圓形軌道運行的運動。</p>
+        <p>儘管速率（Speed）不變，但因速度（Velocity）的方向隨時在改變，故物體隨時具有指向圓心的加速度。</p>
+        
+        <h2>公式表示</h2>
+        <div class="formula-box">
+            <b>基本定義：</b><br>
+            角速度：ω = 2π / T (rad/s)<br>
+            線速度：v = ω · r<br>
+            週期：T = 2π / ω (s)<br>
+        </div>
+        <div class="formula-box">
+            <b>動力學：</b><br>
+            向心加速度：a<sub>c</sub> = v² / r = ω² · r<br>
+            向心力：F<sub>c</sub> = m · a<sub>c</sub>
+        </div>
 
-<section>
-  <h2>定律內容</h2>
-  <p>
-    圓周運動指物體以固定半徑圍繞一中心做圓周路徑運動的情形。若為勻速圓周運動，角速度（或角頻率）維持恆定，則物體具有向心加速度，其方向指向圓心。
-  </p>
+        <h2>向量方向</h2>
+        <p>
+            <b>1. 速度 (v)：</b> 始終沿著圓周的<b>切線方向</b>（綠色）。<br>
+            <b>2. 加速度 (a) & 力 (F)：</b> 始終指向<b>圓心</b>（橘色與紫色），負責改變速度的方向而非大小。
+        </p>
 
-  
+        <h2>常見應用</h2>
+        <p>1. <b>天體運行：</b> 行星繞日、衛星繞地。<br>
+           2. <b>工業機械：</b> 飛輪、離心分離機。<br>
+           3. <b>日常生活：</b> 洗衣機脫水、旋轉木馬。</p>
 
-  <h2>公式表示</h2>
-  <div class="formula-box">
-    角速度：ω（rad/s）<br>
-    線速度：v = ω · r<br>
-    向心加速度：a_c = v² / r = ω² · r<br>
-    向心力：F_c = m · a_c = m · ω² · r<br>
-    週期：T = 2π / ω
-  </div>
-
-  <h2>圖像理解</h2>
-  <p>
-    圓周運動的向心加速度方向始終指向圓心，速度方向切線於軌道。畫布上會顯示質點、軌道圓圈、速度或向心力向量，幫助理解速度與加速度方向的差異。
-  </p>
-
-  <h2>適用範圍</h2>
-  <p>
-    本模型適用於剛體或質點作圓周運動，忽略空氣阻力或其他摩擦力的理想情形。
-  </p>
-
-  <h2>常見應用</h2>
-  <p>
-    汽車轉彎的向心力、旋轉機械（風扇、轉子）、行星近似運動、離心機設計等。
-  </p>
-</section>
-
-<section>
-  <h2>實驗模擬：圓周運動</h2>
-
-  <div class="control-panel">
-    <div class="control">
-      <div class="control-row">
-        <label>半徑 r (m)：<input id="r" type="number" value="80" min="1" step="1"></label>
-        <label>角速度 ω (rad/s)：<input id="omega" type="number" value="2" step="0.1"></label>
-      </div>
-      <div class="control-row">
-        <label>質量 m (kg)：<input id="mass" type="number" value="1" step="0.1"></label>
-        <label>顯示向量：
-          <select id="showVec">
-            <option value="none">不顯示</option>
-            <option value="v" selected>速度 v</option>
-            <option value="a">向心加速度 a_c</option>
-            <option value="F">向心力 F_c</option>
-          </select>
-        </label>
-        <button onclick="startRotation()">開始</button>
-        <button onclick="stopRotation()" style="background:#d35400;">停止</button>
-        <button onclick="resetRotation()" style="background:#7f8c8d;">重設</button>
-      </div>
+        <h2>隨堂測驗</h2>
+        <div id="quiz-area" style="font-size: 14px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <p><b>Q1: 若半徑 r 固定，角速度 ω 變為 2 倍，向心力 F 會變為幾倍？</b></p>
+            <button onclick="checkQuiz(this, false)">2 倍</button>
+            <button onclick="checkQuiz(this, true)">4 倍</button>
+            <button onclick="checkQuiz(this, false)">不變</button>
+            <p id="quiz-feedback" style="margin-top:10px; font-weight:bold;"></p>
+        </div>
     </div>
 
-    <div id="info">
-      <p>ω: <strong id="omegaVal">2.00</strong> rad/s</p>
-      <p>v: <strong id="vVal">0.00</strong> m/s</p>
-      <p>a_c: <strong id="aVal">0.00</strong> m/s²</p>
-      <p>F_c: <strong id="FVal">0.00</strong> N</p>
-      <p>T: <strong id="TVal">0.00</strong> s</p>
-    </div>
-  </div>
+    <div id="experiment-card">
+        <div class="mode-tabs">
+            <div class="mode-tab active" id="tab-std" onclick="switchMode('standard')">🔬 基礎探索模式</div>
+            <div class="mode-tab" id="tab-safe" onclick="switchMode('safety')">🏎️ 賽車安全模式</div>
+        </div>
 
-  <canvas id="c" width="900" height="500"></canvas>
-</section>
+        <div id="exp-header">
+            <div class="control-group">
+                <span class="slider-label">半徑 r: <span id="rDisp">50</span> m</span>
+                <input type="range" id="r" min="10" max="100" step="1" value="50" oninput="updateParams()">
+            </div>
+            <div class="control-group">
+                <span class="slider-label">角速度 ω: <span id="omegaDisp">2.0</span> rad/s</span>
+                <input type="range" id="omega" min="0.1" max="6.0" step="0.1" value="2.0" oninput="updateParams()">
+            </div>
+            <div class="control-group">
+                <span class="slider-label">質量 m: <span id="mDisp">1000</span> kg</span>
+                <input type="range" id="mass" min="100" max="2000" step="100" value="1000" oninput="updateParams()">
+            </div>
+
+            <div class="control-group std-ctrl">
+                <span class="slider-label">顯示向量 (Vectors)</span>
+                <select id="showVec" onchange="drawScene()">
+                    <option value="all">全部顯示</option>
+                    <option value="v">僅速度 (v)</option>
+                    <option value="a">僅加速度 (ac)</option>
+                    <option value="F">僅向心力 (Fc)</option>
+                </select>
+            </div>
+            
+            <div class="control-group safe-ctrl hidden" style="border-left: 1px solid #ddd; padding-left: 10px;">
+                <span class="slider-label" style="color:#d35400">路面摩擦極限 (供給)</span>
+                <input type="range" id="frictionLimit" min="100000" max="600000" step="10000" value="300000" oninput="updateMaxForce()">
+                <div style="font-size:10px; color:#666;">Max: <span id="frictionDisp">300000</span> N</div>
+            </div>
+
+            <div style="margin-left:auto; display:flex; gap:8px;">
+                <button class="btn-record" onclick="recordData()">紀錄</button>
+                <button class="btn-reset" onclick="resetSim()">重置</button>
+                <button onclick="openRecordModal()" style="background: #333;">紀錄簿</button>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="success-toast"><span class="checkmark">✔</span><div>數據已成功紀錄</div></div>
+            <div id="hint-msg">💡 提示：試著調整半徑與角速度，觀察向心力的數值變化。</div>
+
+            <div id="telemetry">
+                <span style="color:var(--accent-green)">Velocity (v):</span> <span id="vVal" style="color:white; font-weight:bold;">0.00</span> m/s<br>
+                <span style="color:var(--accent-orange)">Accel (ac):</span> <span id="aVal" style="color:white; font-weight:bold;">0.00</span> m/s²<br>
+                <span style="color:var(--accent-purple)">Force (Fc):</span> <span id="FVal" style="color:white; font-weight:bold;">0.00</span> N<br>
+                <hr style="border-color:#555; margin:5px 0;">
+                <div id="safety-status" style="font-size: 12px; color: #51cf66;">狀態: 安全</div>
+            </div>
+            
+            <canvas id="c"></canvas>
+        </div>
+    </div>
+</div>
+
+<div id="recordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin:0;">📔 實驗紀錄簿</h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button onclick="clearRecords()" style="background: var(--accent-red); padding: 5px 15px; font-size: 13px;">清除所有紀錄</button>
+                <span class="close-btn" onclick="closeModal('recordModal')">&times;</span>
+            </div>
+        </div>
+        <table id="recordTable">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>模式</th>
+                    <th>半徑 r</th>
+                    <th>角速度 ω</th>
+                    <th>向心力 Fc</th>
+                    <th>摩擦極限</th>
+                    <th>結果</th>
+                </tr>
+            </thead>
+            <tbody id="recordBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="skidInfoModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 class="modal-title" style="color: var(--accent-orange);">🏎️ 賽車過彎物理</h2>
+            <span class="close-btn" onclick="closeModal('skidInfoModal')">&times;</span>
+        </div>
+        <div style="font-size: 16px; line-height: 1.6; color: #444;">
+            <p>車輛轉彎時，「需求向心力」必須由輪胎與地面的「最大靜摩擦力」來提供（供給）。</p>
+            <div class="formula-box" style="margin: 15px 0; font-family: 'Times New Roman', serif;">
+                需求 (Demand): F<sub>c</sub> = m · ω<sup>2</sup> · r<br>
+                供給 (Supply): f<sub>max</sub> = μ<sub>s</sub> · N
+            </div>
+            <p><b>打滑失控：</b></p>
+            <p>當 <b>需求 > 供給</b> 時，摩擦力拉不住車子，物理學上無法維持圓周運動，車子會依照<b>慣性 (Newton's 1st Law)</b> 沿切線方向飛出。</p>
+            <button onclick="closeModal('skidInfoModal')" style="width:100%; margin-top:10px; padding:12px;">我瞭解了，開始實驗</button>
+        </div>
+    </div>
+</div>
+
+<div id="crashModal" class="modal" style="z-index: 2500;">
+    <div class="modal-content" style="max-width: 500px; border: 3px solid var(--accent-red);">
+        <div class="modal-header" style="border-bottom-color: var(--accent-red);">
+            <h2 class="modal-title" style="color: var(--accent-red);">⚠️ 失控打滑 (Skidding)</h2>
+        </div>
+        <div style="font-size: 16px; line-height: 1.6; color: #444;">
+            <p style="font-size:18px; font-weight:bold;">為什麼會飛出去？</p>
+            <p>當前的<b>向心力需求 (Demand)</b> 已經超過了輪胎能提供的<b>最大靜摩擦力 (Supply)</b>。</p>
+            <ul style="background:#fff5f5; padding:15px 30px; border-radius:8px;">
+                <li>摩擦力拉不住車子。</li>
+                <li>根據<b>牛頓第一運動定律 (慣性)</b>，物體傾向保持直線運動。</li>
+                <li>因此車輛沿著切線方向飛出。</li>
+            </ul>
+            <p><b>💡 安全建議：</b>請嘗試降低角速度 (ω) 或增大轉彎半徑 (r)。</p>
+            <button onclick="resetSim(); closeModal('crashModal');" style="width:100%; margin-top:10px; padding:12px; background:var(--accent-red);">重置模擬 (Reset)</button>
+        </div>
+    </div>
+</div>
 
 <script>
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const COLOR_V = '#51cf66';
+    const COLOR_A = '#ff922b';
+    const COLOR_F = '#cc5de8';
 
-let r_m = parseFloat(document.getElementById('r').value); 
-let omega = parseFloat(document.getElementById('omega').value); 
-let mass = parseFloat(document.getElementById('mass').value); 
-const scale = 2; 
-const centerX = canvas.width / 2;
-const centerY = canvas.height / 2;
+    let currentMode = 'standard';
+    let r_val = 50; 
+    let omega_val = 2.0; 
+    let m_val = 1000.0; 
+    let angle = 0;
 
-let angle = 0;
-let rotating = false;
-let lastTimestamp = null;
+    let isSkidding = false;
+    let skidX = 0, skidY = 0;
+    let skidVx = 0, skidVy = 0;
+    let maxForce = 300000; 
 
-const omegaVal = document.getElementById('omegaVal');
-const vVal = document.getElementById('vVal');
-const aVal = document.getElementById('aVal');
-const FVal = document.getElementById('FVal');
-const TVal = document.getElementById('TVal');
-const showVec = document.getElementById('showVec');
+    const scale = 3.0; 
+    let centerX, centerY;
 
-function updateInfo() {
-  omegaVal.innerText = omega.toFixed(2);
-  const v = omega * r_m;
-  const a_c = omega * omega * r_m; 
-  const F_c = mass * a_c; 
-  const T = omega === 0 ? Infinity : (2 * Math.PI / omega);
+    let records = [];
 
-  vVal.innerText = v.toFixed(2);
-  aVal.innerText = a_c.toFixed(2);
-  FVal.innerText = F_c.toFixed(2);
-  TVal.innerText = (isFinite(T) ? T.toFixed(2) : '∞');
-}
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        centerX = canvas.width / 2;
+        centerY = canvas.height / 2;
+        if(!isSkidding) drawScene();
+    }
 
-function drawScene() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const r_px = r_m * scale;
-  
-  // 畫圓形軌道
-  ctx.beginPath();
-  ctx.strokeStyle = '#b8c0c6';
-  ctx.setLineDash([5, 5]); // 虛線軌道
-  ctx.lineWidth = 1;
-  ctx.arc(centerX, centerY, r_px, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]); // 恢復實線
+    function switchMode(mode) {
+        currentMode = mode;
+        if (mode === 'safety') {
+            r_val = 50; 
+            omega_val = 2.0;
+            m_val = 1000.0;
+            document.getElementById('r').value = 50;
+            document.getElementById('omega').value = 2.0;
+            document.getElementById('mass').value = 1000;
+        }
 
-  const px = centerX + r_px * Math.cos(angle);
-  const py = centerY + r_px * Math.sin(angle);
+        resetSim(); 
 
-  // 畫質點
-  ctx.beginPath();
-  ctx.fillStyle = '#1c7ed6';
-  ctx.arc(px, py, 12, 0, Math.PI * 2);
-  ctx.fill();
+        document.getElementById('tab-std').classList.toggle('active', mode === 'standard');
+        document.getElementById('tab-safe').classList.toggle('active', mode === 'safety');
+        if (mode === 'safety') document.getElementById('tab-safe').classList.add('safety');
+        else document.getElementById('tab-safe').classList.remove('safety');
 
-  const sel = showVec.value;
-  if (sel === 'v') {
-    const v = omega * r_m;
-    const len = Math.min(120, v * 0.5);
-    const tx = -Math.sin(angle); 
-    const ty = Math.cos(angle);  
-    drawArrow(px, py, px + tx * len, py + ty * len, '#27ae60');
-  } else if (sel === 'a') {
-    const a_c = omega * omega * r_m;
-    const len = Math.min(100, a_c * 0.1);
-    const ux = (centerX - px) / r_px;
-    const uy = (centerY - py) / r_px;
-    drawArrow(px, py, px + ux * len, py + uy * len, '#e67e22');
-  } else if (sel === 'F') {
-    const a_c = omega * omega * r_m;
-    const F = mass * a_c;
-    const len = Math.min(100, F * 0.1);
-    const ux = (centerX - px) / r_px;
-    const uy = (centerY - py) / r_px;
-    drawArrow(px, py, px + ux * len, py + uy * len, '#8e44ad');
-  }
+        if (mode === 'standard') {
+            document.querySelector('.std-ctrl').classList.remove('hidden');
+            document.querySelector('.safe-ctrl').classList.add('hidden');
+            document.getElementById('hint-msg').innerText = "💡 提示：試著調整半徑與角速度，觀察向心力的數值變化。";
+        } else {
+            document.querySelector('.std-ctrl').classList.add('hidden');
+            document.querySelector('.safe-ctrl').classList.remove('hidden');
+            document.getElementById('hint-msg').innerText = "⚠️ 警告：請注意右方摩擦力負荷，避免超速打滑！";
+            document.getElementById('skidInfoModal').style.display = "block";
+        }
+        updateParams();
+    }
 
-  // 中心點
-  ctx.beginPath();
-  ctx.fillStyle = '#333';
-  ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
-  ctx.fill();
-}
+    function updateMaxForce() {
+        maxForce = parseInt(document.getElementById('frictionLimit').value);
+        document.getElementById('frictionDisp').innerText = maxForce;
+        updateParams();
+    }
 
-function drawArrow(x1, y1, x2, y2, color) {
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
-  ctx.lineWidth = 3;
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-  const a = Math.atan2(y2 - y1, x2 - x1);
-  const headLen = 10;
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - headLen * Math.cos(a - Math.PI/6), y2 - headLen * Math.sin(a - Math.PI/6));
-  ctx.lineTo(x2 - headLen * Math.cos(a + Math.PI/headLen), y2 - headLen * Math.sin(a + Math.PI/6));
-  ctx.closePath();
-  ctx.fill();
-}
+    function updateParams() {
+        if(isSkidding) return;
 
-function animate(timestamp) {
-  if (!rotating) return;
-  if (!lastTimestamp) lastTimestamp = timestamp;
-  const dt = (timestamp - lastTimestamp) / 1000; 
-  lastTimestamp = timestamp;
-  angle += omega * dt;
-  updateInfo();
-  drawScene();
-  requestAnimationFrame(animate);
-}
+        r_val = parseFloat(document.getElementById('r').value);
+        omega_val = parseFloat(document.getElementById('omega').value);
+        m_val = parseFloat(document.getElementById('mass').value);
 
-function startRotation() {
-  r_m = parseFloat(document.getElementById('r').value);
-  omega = parseFloat(document.getElementById('omega').value);
-  mass = parseFloat(document.getElementById('mass').value);
-  rotating = true;
-  lastTimestamp = null;
-  updateInfo();
-  requestAnimationFrame(animate);
-}
+        document.getElementById('rDisp').innerText = r_val.toFixed(0);
+        document.getElementById('omegaDisp').innerText = omega_val.toFixed(1);
+        document.getElementById('mDisp').innerText = m_val.toFixed(0);
 
-function stopRotation() {
-  rotating = false;
-  lastTimestamp = null;
-}
+        checkSafetyAndLoad();
+        updateTelemetry();
+    }
 
-function resetRotation() {
-  stopRotation();
-  angle = 0;
-  document.getElementById('r').value = 80;
-  document.getElementById('omega').value = 2;
-  document.getElementById('mass').value = 1;
-  r_m = 80; omega = 2; mass = 1;
-  updateInfo();
-  drawScene();
-}
+    function checkSafetyAndLoad() {
+        const ac = omega_val * omega_val * r_val;
+        const Fc = m_val * ac;
+        const statusEl = document.getElementById('safety-status');
+        
+        let percent = (Fc / maxForce) * 100;
+        
+        if (currentMode === 'safety') {
+            if (Fc > maxForce) {
+                startSkid();
+                statusEl.innerHTML = "狀態: <b style='color:#fa5252'>危險 (DANGER)</b>";
+            } else {
+                let color = percent > 80 ? "#ff922b" : "#51cf66";
+                statusEl.innerHTML = `摩擦力負荷: <b style='color:${color}'>${percent.toFixed(0)}%</b>`;
+            }
+        } else {
+            if (Fc > maxForce) {
+                statusEl.innerHTML = `摩擦力負荷: <b style='color:#fa5252'>⚠️ 物理不可能 (>100%)</b>`;
+            } else {
+                statusEl.innerHTML = `摩擦力負荷: <b style='color:#339af0'>${percent.toFixed(0)}%</b> (理論值)`;
+            }
+        }
+    }
 
-updateInfo();
-drawScene();
+    function startSkid() {
+        isSkidding = true;
+        const r_px = r_val * scale;
+        skidX = centerX + r_px * Math.cos(angle);
+        skidY = centerY + r_px * Math.sin(angle);
+        
+        const v = omega_val * r_val * scale; 
+        skidVx = -Math.sin(angle) * v; 
+        skidVy = Math.cos(angle) * v; 
+
+        document.getElementById('r').disabled = true;
+        document.getElementById('omega').disabled = true;
+        setTimeout(() => {
+            document.getElementById('crashModal').style.display = "block";
+        }, 800); 
+    }
+
+    function updateTelemetry() {
+        const v = omega_val * r_val;
+        const ac = omega_val * omega_val * r_val;
+        const Fc = m_val * ac;
+        
+        document.getElementById('vVal').innerText = v.toFixed(2);
+        document.getElementById('aVal').innerText = ac.toFixed(2);
+        document.getElementById('FVal').innerText = Fc.toFixed(0);
+    }
+
+    function drawScene() {
+        ctx.fillStyle = 'rgba(43, 50, 58, 0.3)'; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(canvas.width, centerY); ctx.stroke();
+
+        const r_px = r_val * scale;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 2;
+        ctx.arc(centerX, centerY, r_px, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]); 
+
+        let px, py, carAngle;
+
+        if (isSkidding) {
+            px = skidX; py = skidY;
+            skidX += skidVx * 0.016; skidY += skidVy * 0.016;
+            carAngle = Math.atan2(skidVy, skidVx) + Math.PI/2; 
+        } else {
+            px = centerX + r_px * Math.cos(angle);
+            py = centerY + r_px * Math.sin(angle);
+            
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(px, py);
+            ctx.stroke();
+            carAngle = angle + Math.PI/2; 
+        }
+
+        if (currentMode === 'safety') {
+            drawCar(px, py, carAngle);
+        } else {
+            ctx.beginPath();
+            ctx.fillStyle = '#339af0';
+            ctx.shadowBlur = 10; ctx.shadowColor = '#339af0';
+            ctx.arc(px, py, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        if (currentMode === 'standard' && !isSkidding) {
+            const vecMode = document.getElementById('showVec').value;
+            const v = omega_val * r_val;
+            const ac = omega_val * omega_val * r_val;
+            const Fc = m_val * ac;
+
+            if (vecMode === 'all' || vecMode === 'v') {
+                const vLen = Math.min(100, v * 0.5);
+                const tx = -Math.sin(angle); const ty = Math.cos(angle);
+                drawArrow(px, py, px + tx * vLen, py + ty * vLen, COLOR_V);
+            }
+            if (vecMode === 'all' || vecMode === 'a') {
+                let aLen = ac * 0.4; 
+                if (aLen < 30) aLen = 30; 
+                if (aLen > r_px * 0.85) aLen = r_px * 0.85; 
+                const ux = -Math.cos(angle); const uy = -Math.sin(angle);
+                drawArrow(px, py, px + ux * aLen, py + uy * aLen, COLOR_A);
+            }
+            if (vecMode === 'all' || vecMode === 'F') {
+                let fLen = Fc * 0.0004;
+                if (fLen < 30) fLen = 30; 
+                if (fLen > r_px * 0.85) fLen = r_px * 0.85; 
+                const ux = -Math.cos(angle); const uy = -Math.sin(angle);
+                const offset = (vecMode==='all') ? 6 : 0; 
+                drawArrow(px, py-offset, px + ux * fLen, py + uy * fLen - offset, COLOR_F);
+            }
+        }
+
+        ctx.beginPath(); ctx.fillStyle = '#eee'; ctx.arc(centerX, centerY, 5, 0, Math.PI * 2); ctx.fill();
+    }
+
+    function drawCar(x, y, rotation) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(rotation);
+        ctx.fillStyle = isSkidding ? '#fa5252' : '#f03e3e';
+        ctx.fillRect(-10, -20, 20, 40); 
+        ctx.fillStyle = '#222';
+        ctx.fillRect(-12, -18, 4, 10); ctx.fillRect(8, -18, 4, 10); 
+        ctx.fillRect(-12, 8, 4, 10); ctx.fillRect(8, 8, 4, 10); 
+        ctx.fillStyle = '#333'; ctx.fillRect(-10, 15, 20, 5);
+        ctx.beginPath(); ctx.fillStyle = '#ffd43b'; ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+    }
+
+    function drawArrow(x1, y1, x2, y2, color) {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3;
+        ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        const headLen = 10; const a = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath(); ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headLen * Math.cos(a - Math.PI/6), y2 - headLen * Math.sin(a - Math.PI/6));
+        ctx.lineTo(x2 - headLen * Math.cos(a + Math.PI/6), y2 - headLen * Math.sin(a + Math.PI/6));
+        ctx.fill();
+    }
+
+    function animate() {
+        if (!isSkidding) angle += omega_val * 0.016;
+        drawScene(); 
+        requestAnimationFrame(animate);
+    }
+
+    function resetSim() {
+        isSkidding = false;
+        document.getElementById('r').disabled = false;
+        document.getElementById('omega').disabled = false;
+        if (currentMode === 'safety') {
+            r_val = 50; omega_val = 2.0; m_val = 1000.0;
+            document.getElementById('r').value = 50;
+            document.getElementById('omega').value = 2.0;
+            document.getElementById('mass').value = 1000;
+        } else {
+            r_val = 50; omega_val = 2.0; m_val = 1000.0;
+            document.getElementById('r').value = 50;
+            document.getElementById('omega').value = 2.0;
+            document.getElementById('mass').value = 1000;
+        }
+        
+        angle = 0;
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        updateParams();
+    }
+
+    function recordData() {
+        const Fc = (m_val * omega_val * omega_val * r_val).toFixed(0);
+        const result = isSkidding ? "失控" : "安全";
+        const modeStr = currentMode === 'standard' ? "基礎" : "賽車";
+        const limitStr = currentMode === 'standard' ? "N/A" : maxForce;
+
+        records.push({
+            time: new Date().toLocaleTimeString(),
+            mode: modeStr, r: r_val, omega: omega_val, Fc, limit: limitStr, result
+        });
+
+        const toast = document.getElementById('success-toast');
+        toast.style.display = 'block';
+        toast.style.animation = 'none';
+        toast.offsetHeight; 
+        toast.style.animation = 'fadeInOut 1.5s ease-in-out';
+        setTimeout(() => { toast.style.display = 'none'; }, 1500);
+    }
+
+    function openRecordModal() {
+        const tbody = document.getElementById('recordBody');
+        tbody.innerHTML = records.map(r => `
+            <tr>
+                <td>${r.time}</td>
+                <td>${r.mode}</td>
+                <td>${r.r}</td>
+                <td>${r.omega}</td>
+                <td>${r.Fc}</td>
+                <td>${r.limit}</td>
+                <td style="color:${r.result==='失控'?'red':'green'}; font-weight:bold;">${r.result}</td>
+            </tr>
+        `).join('');
+        document.getElementById('recordModal').style.display = "block";
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    function clearRecords() { if(confirm("確定清空？")) { records = []; openRecordModal(); } }
+
+    function checkQuiz(btn, isCorrect) {
+        const feedback = document.getElementById('quiz-feedback');
+        if(isCorrect) {
+            feedback.innerText = "✅ 正確！F = mω²r，力與 ω 平方成正比。";
+            feedback.style.color = "var(--accent-green)";
+            btn.style.background = "var(--accent-green)"; btn.style.color="white";
+        } else {
+            feedback.innerText = "❌ 錯誤，請參考 F = mω²r 公式。";
+            feedback.style.color = "var(--accent-red)";
+            btn.style.background = "var(--accent-red)"; btn.style.color="white";
+        }
+    }
+
+    window.addEventListener('resize', resize);
+    window.onclick = function(e) { if(e.target == document.getElementById('recordModal')) closeModal('recordModal'); };
+    resize();
+    updateMaxForce();
+    updateParams();
+    animate();
+
 </script>
 </body>
 </html>

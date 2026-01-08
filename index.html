@@ -6,11 +6,10 @@
 <title>物理實驗與理論探索</title>
 
 <style>
-  /* 全域設定：深色視覺基調 */
   body {
     font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
     margin: 0;
-    background-color: #0a192f; /* 深藍黑色底 */
+    background-color: #0a192f; 
     background-image: 
       radial-gradient(circle at 50% 50%, #172a45 0%, #0a192f 100%);
     color: #ccd6f6;
@@ -18,7 +17,6 @@
     min-height: 100vh;
   }
 
-  /* 科技感背景網格 */
   body::before {
     content: "";
     position: fixed;
@@ -30,7 +28,6 @@
     z-index: -1;
   }
 
-  /* 首頁標題區 */
   .hero {
     text-align: center;
     padding: 50px 20px 60px;
@@ -50,7 +47,6 @@
     line-height: 1.8;
   }
 
-  /* 卡片容器 */
   .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -60,7 +56,6 @@
     padding: 0 40px;
   }
 
-  /* 毛玻璃卡片設計 */
   .card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
@@ -81,7 +76,6 @@
     background: rgba(255, 255, 255, 0.07);
   }
 
-  /* 圖片包裝與效果 */
   .card-img-wrapper {
     height: 190px;
     overflow: hidden;
@@ -91,7 +85,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.7; /* 平時暗一些 */
+    opacity: 0.7; 
     transition: 0.6s ease;
     filter: grayscale(30%);
   }
@@ -105,7 +99,6 @@
     padding: 25px;
   }
 
-  /* 霓虹標籤 */
   .tag {
     display: inline-block;
     padding: 4px 12px;

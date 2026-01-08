@@ -1,342 +1,561 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>聲波與聽覺 (Sound & Hearing)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>物理實驗室 - 聲波與聽覺</title>
+    <style>
+        :root {
+            --nav-bg: #2c3e50;
+            --theory-bg: rgba(255, 255, 255, 0.98);
+            --lab-bg: #2b323a;
+            --accent-green: #51cf66; 
+            --accent-blue: #339af0;
+            --accent-orange: #ff922b;
+            --accent-purple: #cc5de8;
+            --accent-red: #fa5252;
+            --text-main: #343a40;
+        }
+        
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: url('img/bb.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-<style>
-  body { 
-    font-family:"Microsoft JhengHei",sans-serif; 
-    margin:0; padding:0; 
-    background: url('img/bb.webp') no-repeat center center fixed; 
-    background-size: cover;
-    color:#333; 
-    line-height:1.8; 
-  }
-  nav {
-    background: rgba(44, 62, 80);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  nav .menu a {
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-  nav .menu a:hover { color: #f1c40f; }
+        nav {
+            height: 60px; background: var(--nav-bg);
+            display: flex; align-items: center; padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100;
+        }
+        nav a { color: #dee2e6; text-decoration: none; margin-right: 25px; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        nav a:hover { color: var(--accent-green); }
+        nav a.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); }
 
-  header { 
-    background: rgba(52, 73, 94, 0.85); 
-    color:white; 
-    text-align:center; 
-    padding:10px 10px; 
-  }
-  h1 { margin:0; font-size:50px; }
+        #main-container {
+            flex-grow: 1; display: flex; padding: 15px; gap: 15px;
+            height: calc(100vh - 60px);
+        }
+        #theory-card {
+            width: 400px; background: var(--theory-bg);
+            border-radius: 12px; padding: 20px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
 
-  section { 
-    max-width:900px; 
-    margin:25px auto; 
-    background: rgba(255, 255, 255, 0.92); 
-    border-radius:12px; 
-    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
-    padding:30px 40px; 
-  }
+        #experiment-card {
+            flex-grow: 1; background: var(--theory-bg);
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  h2 { 
-    font-size:35px;
-    color:#1a5276; 
-    border-left:6px solid #1a5276; 
-    padding-left:15px; 
-    margin-top:20px; 
-    margin-bottom:20px; 
-  }
+        #exp-header {
+            padding: 20px 25px; background: #f8f9fa; 
+            border-bottom: 1px solid #dee2e6;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
 
-  p { font-size:20px; text-align:justify; }
+        .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-right: 15px; }
+        .slider-label { font-size: 12px; font-weight: bold; color: #555; }
+        
+        input[type="range"] { 
+            width: 240px; 
+            cursor: pointer; height: 6px; border-radius: 3px; background: #dee2e6; outline: none; appearance: none; 
+        }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; transition: 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        
+        .control-group.danger .slider-label { color: var(--accent-red); }
+        .control-group.danger input[type="range"]::-webkit-slider-thumb { background: var(--accent-red); }
 
-  .formula-box {
-    background: rgba(26, 82, 118, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #1a5276;
-    margin: 15px 0;
-  }
+        select {
+            appearance: none; background-color: #fff; border: 1px solid #ced4da;
+            border-radius: 6px; padding: 6px 30px 6px 12px; font-size: 14px;
+            color: #495057; cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 8px center; background-size: 14px;
+        }
+        select:focus { outline: none; border-color: var(--accent-blue); }
 
-  .control-panel {
-    background: #fdfefe;
-    border: 1px solid #d5dbdb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
+        button { 
+            background: var(--accent-blue); color: white; border: none; padding: 8px 18px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;
+        }
+        button:hover { background: #228be6; transform: translateY(-2px); }
+        .btn-play { background: var(--accent-green); width: 100px; font-size: 14px; }
+        .btn-play.playing { background: var(--accent-red); animation: pulse 2s infinite; }
+        .btn-record { background: var(--accent-purple); }
+        .btn-record:hover { background: #be4bdb; }
 
-  .control { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 15px; 
-  }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(250, 82, 82, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(250, 82, 82, 0);} 100% {box-shadow: 0 0 0 0 rgba(250, 82, 82, 0);} }
 
-  .control-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
+        #canvas-container {
+            flex-grow: 1; position: relative;
+            background: var(--lab-bg); margin: 10px;
+            border-radius: 8px; border: 1px solid #454d55; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        canvas { width: 100%; display: block; }
+        #waveCanvas { flex: 2; border-bottom: 1px solid #444; }
+        #freqCanvas { flex: 1; background: rgba(0,0,0,0.2); }
 
-  label { font-size: 22px; font-weight: bold; }
-  input { font-size:18px; padding:6px; width: 100px; border-radius:4px; border:1px solid #ccc; }
-  
-  button { 
-    background:#1a5276; 
-    color:white; 
-    border:none; 
-    cursor:pointer; 
-    border-radius:4px; 
-    padding: 8px 25px;
-    font-size: 18px;
-    transition: 0.3s;
-  }
-  button:hover { background:#2471a3; transform: scale(1.05); }
+        #telemetry {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(33, 37, 41, 0.9); 
+            color: #ecf0f1; 
+            padding: 15px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 14px; border-left: 4px solid var(--accent-green);
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .info-btn {
+            position: absolute; top: 5px; right: 5px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); color: #fff;
+            font-size: 12px; line-height: 20px; text-align: center;
+            cursor: pointer; font-family: sans-serif; font-weight: bold;
+            pointer-events: auto;
+        }
+        .info-btn:hover { background: var(--accent-blue); }
 
-  #info { 
-    display:flex; 
-    justify-content:center; 
-    gap:25px; 
-    margin-top:20px; 
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-    flex-wrap: wrap;
-  }
-  #info p { font-size: 22px; font-weight: bold; margin: 5px; }
-  #info span { color: #d35400; }
+        .modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 10% auto; padding: 25px;
+            border-radius: 12px; width: 60%; max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: slideIn 0.3s;
+        }
+        @keyframes slideIn { from {transform: translateY(-50px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+        
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px;
+        }
+        .close-btn { font-size: 28px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: #000; }
+        
+        #success-toast {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(40, 40, 40, 0.95); color: white;
+            padding: 20px 40px; border-radius: 10px; text-align: center;
+            display: none; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeInOut 1.5s ease-in-out;
+        }
+        .checkmark { font-size: 40px; color: var(--accent-green); display: block; margin-bottom: 10px; }
+        h1 { font-size: 40px; color: var(--text-main); margin: 0 0 10px 0; border-bottom: 3px solid var(--accent-green); padding-bottom: 5px; }
+        h2 { font-size: 20px; color: #1a5276; margin-top: 20px; border-left: 5px solid #1a5276; padding-left: 10px; }
+        p { color: #444; line-height: 1.6; font-size: 16px; text-align: justify; margin: 5px 0; }
+        
+        .formula-box { 
+            background: #f8f9fa; padding: 12px; border-radius: 6px; 
+            font-size: 15px; border: 1px solid #e9ecef; margin-top: 8px; 
+            font-family: "Times New Roman", serif; line-height: 1.6;
+        }
 
-  canvas { 
-    border:2px solid #333; 
-    background:#fff; 
-    display:block; 
-    margin:20px auto; 
-    border-radius: 5px;
-  }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: var(--nav-bg); color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
 
-  .warning {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background: #e74c3c;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    font-size: 16px;
-  }
-  .warning::after {
-    content: "請避免將振幅調整過大，以免音量過高造成聽覺不適。建議：2 以下";
-    position: absolute;
-    bottom: 140%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-    z-index: 10;
-  }
-  .warning:hover::after { opacity: 1; }
-</style>
+        #quiz-area button { width: 100%; margin: 5px 0; text-align: left; background: #e9ecef; color: #333; }
+        #quiz-area button:hover { background: #dee2e6; transform: none; }
+    </style>
 </head>
-
 <body>
 
 <nav>
-  <div class="menu">
-    <a href="index.html">首頁 (Home)</a>
-    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
-    <a href="Mechanical Waves.html">機械波</a>
-    <a href="Projectile Motion.html">拋體運動</a>
-    <a href="Rotation of Rigid Bodies.html">圓周旋轉</a>
-    <a href="Sound & Hearing.html" style="color:#f1c40f">聲音聽覺</a>
-  </div>
+    <a href="index.html">Home</a>
+    <a href="Projectile Motion.html" >Projectile Motion</a>
+    <a href="Mechanical Waves.html">Mechanical Waves</a>
+    <a href="Rotation of Rigid Bodies.html">Rotation of Rigid Bodies</a>
+    <a href="Equilibrium & Elasticity.html" >Equilibrium & Elasticity</a>
+    <a href="Sound & Hearing.html"class="active">Sound & Hearing</a>
 </nav>
 
-<header>
-  <h1>聲波與聽覺（Sound & Hearing）</h1>
-</header>
+<div id="main-container">
+    <div id="theory-card">
+        <h1>聲波與聽覺</h1>
+        
+        <h2>定律內容</h2>
+        <p>聲音是由物體振動產生的縱波 (Longitudinal Wave)。</p>
+        <p>人耳對聲音的感受主要取決於兩個物理量：<b>頻率</b>決定音高 (Pitch)，<b>振幅</b>決定響度 (Loudness)。</p>
+        
+        <h2>公式表示</h2>
+        <div class="formula-box">
+            <b>波函數：</b><br>
+            y(t) = A · sin(2πft)<br>
+            <b>物理量：</b><br>
+            A：振幅 (對應音量 dB)<br>
+            f：頻率 (Hz, 1/T)
+        </div>
 
-<section>
-  <h2>定律內容</h2>
-  <p>
-    聲音是由物體振動產生的機械波，透過介質（如空氣）以縱波形式傳播。聲波可用正弦函數表示，其振幅與頻率分別影響人耳對聲音大小與音高的感覺。
-  </p>
-  <h2>公式表示</h2>
-  <div class="formula-box">
-    聲波位移：y = A sin(2πft)<br>
-    A：振幅（影響音量）<br>
-    f：頻率（影響音高）
-  </div>
+        <h2>聽覺範圍</h2>
+        <p>
+            <b>人耳可聽：</b> 20 Hz ~ 20,000 Hz<br>
+            <b>次聲波：</b> < 20 Hz (如地震波)<br>
+            <b>超音波：</b> > 20,000 Hz (如蝙蝠導航)
+        </p>
 
-  <h2>圖像理解</h2>
-  <p>
-    波形的上下振動幅度代表振幅大小，單位時間內的振動次數代表頻率高低。振幅越大，聲音越大聲；頻率越高，音高越高。
-  </p>
+        <h2>常見應用</h2>
+        <p>1. <b>音樂聲學：</b> 標準音高 A4 = 440 Hz。<br>
+           2. <b>醫學檢測：</b> 超音波掃描 (Ultrasound)。<br>
+           3. <b>噪音工程：</b> 聲波反相抵消技術 (降噪耳機)。</p>
 
-  <h2>適用範圍</h2>
-  <p>
-    本模型適用於理想聲波與基本聽覺概念說明，未考慮空氣阻力、能量衰減與複合音波。
-  </p>
-
-  <h2>常見應用</h2>
-  <p>
-    音樂音高分析、聲學工程、醫學聽力測試、語音處理與音訊科技等。
-  </p>
-</section>
-
-<section>
-  <h2>實驗模擬：聲波與聽覺</h2>
-
-  <div class="control-panel">
-    <div class="control">
-      <div class="control-row">
-        <label>
-          <span class="warning">!</span>振幅 A：
-          <input type="number" id="amplitude" value="1" step="0.1" min="0">
-        </label>
-        <label>
-          頻率 f (Hz)：
-          <input type="number" id="frequency" value="440" step="10" min="1" max="20000">
-        </label>
-      </div>
-      <div class="control-row">
-        <button onclick="startSound()">開始實驗</button>
-        <button onclick="stopSound()" style="background:#7f8c8d;">停止</button>
-      </div>
+        <h2>隨堂測驗</h2>
+        <div id="quiz-area" style="font-size: 14px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <p><b>Q1: 頻率越高，我們聽到的聲音會有什麼變化？</b></p>
+            <button onclick="checkQuiz(this, false)">聲音變大聲</button>
+            <button onclick="checkQuiz(this, true)">音調變高尖</button>
+            <button onclick="checkQuiz(this, false)">傳播速度變快</button>
+            <p id="quiz-feedback" style="margin-top:10px; font-weight:bold;"></p>
+        </div>
     </div>
 
-    <div id="info">
-      <p>振幅 A：<span id="ampInfo">1.00</span></p>
-      <p>頻率 f：<span id="freqInfo">440</span> Hz</p>
-      <p>聽覺狀態：<span id="hearInfo">人耳可聽</span></p>
-    </div>
-  </div>
+    <div id="experiment-card">
+        <div id="exp-header">
+            <div class="control-group">
+                <span class="slider-label">頻率 f: <span id="freqDisp">440</span> Hz</span>
+                <input type="range" id="freq" min="20" max="5000" step="1" value="440" oninput="updateParams()">
+            </div>
+            
+            <div class="control-group" id="amp-group">
+                <span class="slider-label">振幅 (音量): <span id="ampDisp">0.5</span></span>
+                <input type="range" id="amp" min="0" max="1.0" step="0.01" value="0.5" oninput="updateParams()">
+            </div>
 
-  <canvas id="canvas" width="900" height="400"></canvas>
-</section>
+            <div class="control-group">
+                 <span class="slider-label">波形種類</span>
+                 <select id="waveType" onchange="updateWaveType()">
+                     <option value="sine">正弦波 (Sine)</option>
+                     <option value="square">方波 (Square)</option>
+                     <option value="sawtooth">鋸齒波 (Saw)</option>
+                     <option value="triangle">三角波 (Triangle)</option>
+                 </select>
+            </div>
+
+            <div style="margin-left:auto; display:flex; gap:8px;">
+                <button class="btn-play" id="playBtn" onclick="toggleSound()">▶ 播放</button>
+                <button class="btn-record" onclick="recordData()">紀錄</button>
+                <button onclick="openModal('recordModal')" style="background: #333;">紀錄簿</button>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="success-toast"><span class="checkmark">✔</span><div>數據已成功紀錄</div></div>
+            
+            <div id="telemetry">
+                <div class="info-btn" onclick="openModal('telemetryHelpModal')">?</div>
+                <span style="color:var(--accent-green)">Frequency:</span> <span id="tel-freq" style="color:white; font-weight:bold;">440</span> Hz<br>
+                <span style="color:var(--accent-blue)">Pitch:</span> <span id="tel-note" style="color:white; font-weight:bold;">A4</span><br>
+                <span style="color:var(--accent-orange)">Gain:</span> <span id="tel-gain" style="color:white; font-weight:bold;">-6.0</span> dB<br>
+                <hr style="border-color:#555; margin:5px 0;">
+                <div id="status-msg" style="font-size: 12px; color: #51cf66;">狀態: 正常</div>
+            </div>
+            
+            <canvas id="waveCanvas"></canvas>
+            <canvas id="freqCanvas"></canvas>
+            
+            <div style="position:absolute; bottom:5px; left:10px; color:#666; font-size:10px;">
+                * 上方：時域波形 (Time Domain) | 下方：頻譜分析 (Frequency Domain)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="recordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin:0;">📔 實驗紀錄簿</h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button onclick="clearRecords()" style="background: var(--accent-red); padding: 5px 15px; font-size: 13px;">清除所有紀錄</button>
+                <span class="close-btn" onclick="closeModal('recordModal')">&times;</span>
+            </div>
+        </div>
+        <table id="recordTable">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>頻率 (Hz)</th>
+                    <th>音高</th>
+                    <th>振幅</th>
+                    <th>波形</th>
+                </tr>
+            </thead>
+            <tbody id="recordBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="telemetryHelpModal" class="modal">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <h2 style="margin:0; color:var(--accent-blue);">📊 數據面板說明</h2>
+            <span class="close-btn" onclick="closeModal('telemetryHelpModal')">&times;</span>
+        </div>
+        <div style="font-size: 15px; line-height: 1.6; color: #444;">
+            <p><b>1. Frequency (頻率):</b><br>
+            聲波每秒振動的次數，單位為赫茲 (Hz)。數值越高，聽起來越尖銳。</p>
+            
+            <p><b>2. Pitch (音高):</b><br>
+            對應音樂中的音名 (如 C4, A4)。幫助你將物理頻率連結到音樂概念。<br>
+            <span style="color:#666; font-size:13px;">* A4 = 440Hz (標準音高)</span></p>
+            
+            <p><b>3. Gain (增益/音量):</b><br>
+            以分貝 (dB) 表示的音量大小。0 dB 為最大輸出，負值表示衰減。</p>
+        </div>
+        <button onclick="closeModal('telemetryHelpModal')" style="width:100%; margin-top:15px;">瞭解</button>
+    </div>
+</div>
+
+<div id="warningModal" class="modal">
+    <div class="modal-content" style="max-width:400px; border:2px solid var(--accent-red);">
+        <div class="modal-header">
+            <h2 style="margin:0; color:var(--accent-red);">⚠️ 音量警告</h2>
+            <span class="close-btn" onclick="closeModal('warningModal')">&times;</span>
+        </div>
+        <p>您目前的音量設定過高，可能會造成聽覺不適或設備受損。</p>
+        <p>系統已自動限制最大輸出。</p>
+        <button onclick="closeModal('warningModal')" style="width:100%; margin-top:10px;">我瞭解了</button>
+    </div>
+</div>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const yCenter = canvas.height / 2;
-const scale = 80;
+    // Canvas Setup
+    const waveCanvas = document.getElementById('waveCanvas');
+    const freqCanvas = document.getElementById('freqCanvas');
+    const ctxWave = waveCanvas.getContext('2d');
+    const ctxFreq = freqCanvas.getContext('2d');
 
-let A = 1;
-let f = 440;
-let time = 0;
-let playing = false;
+    // Audio Context
+    let audioCtx;
+    let oscillator;
+    let gainNode;
+    let analyser;
+    let isPlaying = false;
 
-const AudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let osc = null;
-let gainNode = null;
+    // Parameters
+    let freq = 440;
+    let amp = 0.5;
+    let waveType = 'sine';
 
-function startSound(){
-  if(playing) stopSound();
+    // Records
+    let records = [];
 
-  A = parseFloat(document.getElementById("amplitude").value);
-  f = parseFloat(document.getElementById("frequency").value);
+    const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-  time = 0;
-  playing = true;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+        }
+    }
 
-  osc = AudioCtx.createOscillator();
-  gainNode = AudioCtx.createGain();
+    function resize() {
+        const container = document.getElementById('canvas-container');
+        waveCanvas.width = container.clientWidth;
+        waveCanvas.height = container.clientHeight * 0.66;
+        freqCanvas.width = container.clientWidth;
+        freqCanvas.height = container.clientHeight * 0.33;
+    }
 
-  osc.type = "sine";
-  osc.frequency.value = f;
-  gainNode.gain.value = A * 0.1;
+    function toggleSound() {
+        initAudio();
+        
+        if (isPlaying) {
+            stopSound();
+        } else {
+            startSound();
+        }
+    }
 
-  osc.connect(gainNode).connect(AudioCtx.destination);
-  osc.start();
+    function startSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        oscillator = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
 
-  requestAnimationFrame(animate);
-}
+        oscillator.type = waveType;
+        oscillator.frequency.value = freq;
+        gainNode.gain.value = amp;
 
-function stopSound(){
-  playing = false;
-  if(osc){
-    osc.stop();
-    osc = null;
-  }
-  drawWave();
-}
+        oscillator.connect(gainNode);
+        gainNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
 
-function animate(){
-  if(!playing) return;
-  time += 0.005;
-  drawWave();
-  updateInfo();
-  requestAnimationFrame(animate);
-}
+        oscillator.start();
+        isPlaying = true;
+        
+        document.getElementById('playBtn').innerHTML = "■ 停止";
+        document.getElementById('playBtn').classList.add('playing');
+        
+        draw();
+    }
 
-function drawWave(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+    function stopSound() {
+        if (oscillator) {
+            oscillator.stop();
+            oscillator.disconnect();
+        }
+        isPlaying = false;
+        document.getElementById('playBtn').innerHTML = "▶ 播放";
+        document.getElementById('playBtn').classList.remove('playing');
+    }
 
+    function updateParams() {
+        freq = parseFloat(document.getElementById('freq').value);
+        amp = parseFloat(document.getElementById('amp').value);
+        
+        // UI Updates
+        document.getElementById('freqDisp').innerText = freq;
+        document.getElementById('ampDisp').innerText = amp.toFixed(2);
+        
+        // Warning Check
+        const ampGroup = document.getElementById('amp-group');
+        const statusEl = document.getElementById('status-msg');
+        
+        if (amp > 0.8) {
+            ampGroup.classList.add('danger');
+            statusEl.innerHTML = "狀態: <b style='color:var(--accent-red)'>音量過大 (High Volume)</b>";
+        } else {
+            ampGroup.classList.remove('danger');
+            statusEl.innerHTML = "狀態: <span style='color:var(--accent-green)'>正常 (Normal)</span>";
+        }
 
-  ctx.beginPath();
-  ctx.moveTo(0, yCenter);
-  ctx.lineTo(canvas.width, yCenter);
-  ctx.strokeStyle = "#ccc";
-  ctx.setLineDash([5, 5]);
-  ctx.stroke();
-  ctx.setLineDash([]);
+        // Pitch Calculation
+        const note = getNoteFromFreq(freq);
+        document.getElementById('tel-freq').innerText = freq;
+        document.getElementById('tel-note').innerText = note;
+        const db = amp > 0 ? (20 * Math.log10(amp)).toFixed(1) : "-Inf";
+        document.getElementById('tel-gain').innerText = db + " dB";
 
-  ctx.beginPath();
-  ctx.strokeStyle = "#1a5276";
-  ctx.lineWidth = 2;
-  
-  let drawFrequency = Math.min(f, 2000) / 500; 
+        // Audio Update
+        if (isPlaying && oscillator) {
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(amp, audioCtx.currentTime);
+        }
+    }
 
-  for(let x=0; x<canvas.width; x++){
-    let xTime = time + x / 200;
-    let y = yCenter - A * scale * Math.sin(2 * Math.PI * drawFrequency * xTime);
-    if(x === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-}
+    function updateWaveType() {
+        waveType = document.getElementById('waveType').value;
+        if (isPlaying && oscillator) {
+            oscillator.type = waveType;
+        }
+    }
 
-function updateInfo(){
-  document.getElementById("ampInfo").innerText = A.toFixed(2);
-  document.getElementById("freqInfo").innerText = f.toFixed(0);
+    function getNoteFromFreq(frequency) {
+        const noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+        const noteIndex = Math.round(noteNum) + 69;
+        const octave = Math.floor(noteIndex / 12) - 1;
+        const noteName = noteStrings[noteIndex % 12];
+        return noteName + octave;
+    }
 
-  let hearText = "";
-  if(f < 20){
-    hearText = "低於可聽範圍 (次聲波)";
-  } else if(f > 20000){
-    hearText = "高於可聽範圍 (超音波)";
-  } else {
-    hearText = "人耳可聽";
-  }
-  document.getElementById("hearInfo").innerText = hearText;
-}
+    // --- Visualization Loop ---
+    function draw() {
+        if (!isPlaying) {
+             ctxWave.fillStyle = '#2b323a';
+             ctxWave.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+             ctxWave.beginPath();
+             ctxWave.strokeStyle = '#51cf66';
+             ctxWave.moveTo(0, waveCanvas.height/2);
+             ctxWave.lineTo(waveCanvas.width, waveCanvas.height/2);
+             ctxWave.stroke();
+             ctxFreq.clearRect(0,0,freqCanvas.width, freqCanvas.height);
+             return;
+        }
+        
+        requestAnimationFrame(draw);
 
-drawWave();
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        // 1. Draw Waveform
+        analyser.getByteTimeDomainData(dataArray);
+        
+        ctxWave.fillStyle = '#2b323a';
+        ctxWave.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+        ctxWave.lineWidth = 2;
+        ctxWave.strokeStyle = '#51cf66';
+        ctxWave.beginPath();
+
+        const sliceWidth = waveCanvas.width * 1.0 / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = v * waveCanvas.height / 2;
+
+            if (i === 0) ctxWave.moveTo(x, y);
+            else ctxWave.lineTo(x, y);
+
+            x += sliceWidth;
+        }
+        ctxWave.lineTo(waveCanvas.width, waveCanvas.height / 2);
+        ctxWave.stroke();
+
+        // 2. Draw Frequency
+        const freqData = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(freqData);
+
+        ctxFreq.clearRect(0, 0, freqCanvas.width, freqCanvas.height);
+        const barWidth = (freqCanvas.width / bufferLength) * 2.5;
+        let barX = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const barHeight = freqData[i] / 255 * freqCanvas.height;
+            ctxFreq.fillStyle = `hsl(${i/bufferLength * 360}, 100%, 50%)`;
+            ctxFreq.fillRect(barX, freqCanvas.height - barHeight, barWidth, barHeight);
+            barX += barWidth + 1;
+        }
+    }
+
+    // --- Data Recording & Modals ---
+    function recordData() {
+        const note = getNoteFromFreq(freq);
+        records.push({
+            time: new Date().toLocaleTimeString(),
+            freq: freq, note: note, amp: amp, type: waveType
+        });
+        
+        const toast = document.getElementById('success-toast');
+        toast.style.display = 'block';
+        toast.style.animation = 'none';
+        toast.offsetHeight;
+        toast.style.animation = 'fadeInOut 1.5s ease-in-out';
+        setTimeout(() => { toast.style.display = 'none'; }, 1500);
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = "block"; }
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    
+    function clearRecords() { if(confirm("確定清空？")) { records = []; openModal('recordModal'); } }
+
+    function checkQuiz(btn, isCorrect) {
+        const feedback = document.getElementById('quiz-feedback');
+        if(isCorrect) {
+            feedback.innerText = "✅ 正確！頻率決定音高 (Pitch)。";
+            feedback.style.color = "var(--accent-green)";
+            btn.style.background = "var(--accent-green)"; btn.style.color="white";
+        } else {
+            feedback.innerText = "❌ 錯誤。聲音大小由振幅決定，速度由介質決定。";
+            feedback.style.color = "var(--accent-red)";
+            btn.style.background = "var(--accent-red)"; btn.style.color="white";
+        }
+    }
+
+    window.addEventListener('resize', resize);
+    window.onclick = function(e) { 
+        if(e.target.classList.contains('modal')) e.target.style.display = 'none';
+    };
+    resize();
+    updateParams();
+    draw(); 
 </script>
-
 </body>
 </html>

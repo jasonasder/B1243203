@@ -1,318 +1,575 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>平衡與彈性（Equilibrium & Elasticity）</title>
-<style>
-  body { 
-    font-family: "Microsoft JhengHei", sans-serif; 
-    margin:0; padding:0; 
-    background: url('img/bb.webp') no-repeat center center fixed; 
-    background-size: cover;
-    color:#333; 
-    line-height:1.8; 
-  }
-  nav {
-    background: rgba(44, 62, 80);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  nav .menu a {
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-  nav .menu a:hover { color: #f1c40f; }
+    <meta charset="utf-8" />
+    <title>物理實驗室 - 平衡與彈性</title>
+    <style>
+        :root {
+            --nav-bg: #2c3e50;
+            --theory-bg: rgba(255, 255, 255, 0.98);
+            --lab-bg: #2b323a;
+            --accent-green: #51cf66; 
+            --accent-blue: #339af0;
+            --accent-orange: #ff922b;
+            --accent-red: #fa5252;
+            --text-main: #343a40;
+        }
+        
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: url('img/bb.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  header { 
-    background: rgba(52, 73, 94, 0.85); 
-    color:white; 
-    text-align:center; 
-    padding: 10px 10px;
-  }
-  h1 { margin:0; font-size:50px; }
+        nav {
+            height: 60px; background: var(--nav-bg);
+            display: flex; align-items: center; padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100;
+        }
+        nav a { color: #dee2e6; text-decoration: none; margin-right: 25px; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        nav a:hover { color: var(--accent-green); }
+        nav a.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); }
 
-  section { 
-    max-width:900px; 
-    margin:25px auto; 
-    background: rgba(255, 255, 255, 0.92); 
-    border-radius:12px; 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
-    padding:30px 40px; 
-  }
 
-  h2 { 
-    font-size:35px;
-    color:#1a5276; 
-    border-left:6px solid #1a5276; 
-    padding-left:15px; 
-    margin-top:20px; 
-    margin-bottom:20px; 
-  }
+        #main-container {
+            flex-grow: 1; display: flex; padding: 15px; gap: 15px;
+            height: calc(100vh - 60px);
+        }
 
-  p { font-size: 20px; text-align:justify; }
+        #theory-card {
+            width: 400px; background: var(--theory-bg);
+            border-radius: 12px; padding: 20px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
 
-  .formula-box {
-    background: rgba(26, 82, 118, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #1a5276;
-    margin: 15px 0;
-    font-size: 20px;
-    font-family: "Times New Roman", Times, serif;
-    font-style: italic;
-  }
+        #experiment-card {
+            flex-grow: 1; background: var(--theory-bg);
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
 
-  .control-panel {
-    background: #fdfefe;
-    border: 1px solid #d5dbdb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
+        #exp-header {
+            padding: 15px 20px; background: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
 
-  .control { 
-    text-align:center; 
-    display:flex; 
-    justify-content:center; 
-    gap:10px; 
-    flex-wrap:wrap;
-  }
-  .control-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .btn-container {
-    width: 100%;
-    margin-top: 15px;
-  }
-  
-  label { font-size: 22px; font-weight: bold; }
-  input, button { font-size:18px; padding:6px 10px; margin:4px; border-radius:4px; }
-  input { border: 1px solid #ccc; width: 80px; }
-  
-  button { 
-    background:#1a5276; 
-    color:#fff; 
-    border:none; 
-    cursor:pointer; 
-    transition: 0.3s;
-    padding: 8px 25px;
-  }
-  button:hover { background:#2471a3; transform: scale(1.05); }
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fff; margin: 5% auto; padding: 20px;
+            border-radius: 12px; width: 80%; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--accent-green); padding-bottom: 10px; margin-bottom: 10px;
+        }
 
-  canvas { 
-    display:block; 
-    margin:20px auto; 
-    border:2px solid #333; 
-    background:#fff; 
-    border-radius: 5px;
-  }
+        #success-toast {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(40, 40, 40, 0.95); color: white;
+            padding: 20px 40px; border-radius: 10px; text-align: center;
+            display: none; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeInOut 1.5s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            15% { opacity: 1; transform: translate(-50%, -50%); }
+            85% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -60%); }
+        }
+        .checkmark {
+            font-size: 40px; color: var(--accent-green); display: block; margin-bottom: 10px;
+        }
 
-  #info { 
-    display:flex; 
-    justify-content:center; 
-    gap:25px; 
-    margin-top:20px; 
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-  } 
-  #info p { margin:0; font-size: 25px; font-weight: bold; }
-  #info span { color: #d35400; }
-</style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: var(--nav-bg); color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .close-btn { font-size: 28px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: #000; }
+        #canvas-container {
+            flex-grow: 1; position: relative;
+            background: var(--lab-bg); margin: 10px;
+            border-radius: 8px; border: 1px solid #454d55; overflow: hidden;
+            cursor: grab;
+        }
+        #canvas-container:active { cursor: grabbing; }
+        canvas { width: 100%; height: 100%; display: block; }
+
+        #telemetry {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(33, 37, 41, 0.9); 
+            color: #ecf0f1; 
+            padding: 10px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 14px; border-left: 4px solid var(--accent-blue);
+            pointer-events: none;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 40px; color: var(--text-main); margin: 0 0 10px 0; border-bottom: 3px solid var(--accent-blue); padding-bottom: 5px; }
+        h2 { font-size: 20px; color: #1a5276; margin-top: 20px; border-left: 5px solid #1a5276; padding-left: 10px; }
+        p { color: #444; line-height: 1.6; font-size: 16px; text-align: justify; margin: 5px 0; }
+        
+        .formula-box { 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 6px; 
+            font-size: 15px; 
+            border: 1px solid #e9ecef; 
+            margin-top: 8px; 
+            font-family: "Times New Roman", serif; 
+            font-style: normal; 
+            line-height: 1.6;
+        }
+
+        .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .control-group.double { flex-direction: row; gap: 15px; border-right: 1px solid #ddd; padding-right: 15px; }
+        .slider-wrapper { display: flex; flex-direction: column; }
+        .slider-label { font-size: 12px; font-weight: bold; color: #555; }
+        input[type="range"] { width: 100px; cursor: pointer; }
+        
+        button { 
+            background: var(--accent-blue); color: white; border: none; padding: 8px 18px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;
+        }
+        button:hover { background: #228be6; }
+        .btn-reset { background: #adb5bd; }
+        .btn-reset:hover { background: #868e96; }
+        .btn-record { background: var(--accent-green); }
+        .btn-record:hover { background: #40c057; }
+
+        #quiz-area button { width: 100%; margin: 5px 0; text-align: left; }
+    </style>
 </head>
 <body>
 
 <nav>
-  <div class="menu">
-    <a href="index.html">首頁 (Home)</a>
-    <a href="Equilibrium & Elasticity.html" style="color:#f1c40f">平衡與彈性</a>
-    <a href="Mechanical Waves.html">機械波</a>
-    <a href="Projectile Motion.html">拋體運動</a>
-    <a href="Rotation of Rigid Bodies.html">圓周旋轉</a>
-    <a href="Sound & Hearing.html">聲音聽覺</a>
-  </div>
+    <a href="index.html">Home</a>
+    <a href="Projectile Motion.html" >Projectile Motion</a>
+    <a href="Mechanical Waves.html">Mechanical Waves</a>
+    <a href="Rotation of Rigid Bodies.html">Rotation of Rigid Bodies</a>
+    <a href="Equilibrium & Elasticity.html"class="active" >Equilibrium & Elasticity</a>
+    <a href="Sound & Hearing.html">Sound & Hearing</a>
 </nav>
 
-<header>
-  <h1>平衡與彈性（Equilibrium & Elasticity）</h1>
-</header>
+<div id="main-container">
+    <div id="theory-card">
+        <h1>平衡與彈性</h1>
+        
+        <h2>定律內容</h2>
+        <p>靜力平衡（Static Equilibrium）要求物體所受的合力（Net Force）與合力矩（Net Torque）皆為零。</p>
+        <p>力矩（Torque, τ）是使物體轉動的趨勢，定義為力臂 r 與垂直分力 F 的乘積。</p>
 
-<section>
-  <h2>定律內容</h2>
-  <p>
-    靜力平衡（Equilibrium）表示物體受力與力矩加總為零。力矩（torque）定義為力與其作用線到支點的距離之乘積：
-  </p>
-  <div class="formula-box">
-    τ = F · r
-  </div>
-  <p>
-    在翹翹板或天秤式的平衡問題中，左右兩側的力矩相等（Στ = 0）則系統平衡；否則會產生轉矩使桿子傾斜。
-  </p>
+        <h2>公式表示</h2>
+        <div class="formula-box">
+            <b>力矩定義：</b><br>
+            τ = r · F · sin(θ)<br>
+            本實驗中 τ = m · g · r
+        </div>
+        <div class="formula-box">
+            <b>平衡條件：</b><br>
+            Στ = τ<sub>left</sub> - τ<sub>right</sub> = 0<br>
+            ΣF = N - (m₁ + m₂ + m<sub>beam</sub>)g = 0
+        </div>
 
-  
+        <h2>適用範圍</h2>
+        <p>此模型適用於<b>剛體（Rigid Body）</b>且支點固定的系統。忽略桿子本身的形變與空氣阻力，並假設桿子質量均勻或質量可忽略不計。</p>
 
-  <h2>公式表示</h2>
-  <div class="formula-box">
-    力矩（對支點）：τ = F · r = m · g · r（N·m）<br>
-    平衡條件：Στ_left = Στ_right（若相等則不轉動）
-  </div>
-  <p>
-    當存在力矩差時，桿子會產生角位移，其大小取決於力矩差與支撐剛度（本模擬以視覺化比例顯示）。
-  </p>
+        <h2>常見應用</h2>
+        <p>1. <b>工程設計：</b> 塔式起重機（吊車）的配重平衡。<br>
+           2. <b>人體力學：</b> 肌肉、骨骼與關節形成的槓桿系統。<br>
+           3. <b>測量工具：</b> 傳統天平與桿秤。</p>
 
-  <h2>圖像理解</h2>
-  <p>
-    畫面以水平桿為示意（中心為支點），在桿上左右放置砝碼。頁面會顯示左、右兩側的力矩大小與差值，並以動畫呈現桿的傾斜情形 —— 力矩大的那側朝下。
-  </p>
+        <h2>實驗探究任務</h2>
+        <div class="formula-box" style="border-left: 4px solid var(--accent-orange);">
+            1. <b>距離與質量的關係：</b>如果左邊質量加倍，距離要如何調整才能平衡？<br>
+            2. <b>尋找未知質量：</b>固定右側，嘗試用左側不同位置來平衡，反推右側質量。
+        </div>
 
-  <h2>適用範圍</h2>
-  <p>
-    適用於靜態或緩慢變化的剛體問題，忽略桿本身質量或將桿質量視為可單獨計算之參數。
-  </p>
-
-  <h2>常見應用</h2>
-  <p>
-    天秤、翹翹板、橋梁負載分析、機械槓桿設計等，設計時需考慮力矩與支撐條件以確保結構或裝置保持穩定。
-  </p>
-</section>
-
-<section>
-  <h2>實驗模擬：力矩平衡</h2>
-
-  <div class="control-panel">
-    <div class="control">
-      <div class="control-group">
-        <label>左質量 m₁ (kg)：<input type="number" id="m1" value="2.0" step="0.1"></label>
-        <label>左距離 r₁ (m)：<input type="number" id="r1" value="1.6" step="0.1"></label>
-      </div>
-      
-      <div class="control-group">
-        <label>右質量 m₂ (kg)：<input type="number" id="m2" value="1.0" step="0.1"></label>
-        <label>右距離 r₂ (m)：<input type="number" id="r2" value="10" step="0.1"></label>
-      </div>
-
-      <div class="btn-container">
-        <button onclick="apply()">更新數據</button>
-      </div>
+        <h2>隨堂測驗</h2>
+        <div id="quiz-area" style="font-size: 14px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <p><b>Q1: 如果 m₁ = 2kg 在距離支點 2m 處，請問右側 m₂ = 4kg 應該放在哪裡才能平衡？</b></p>
+            <button onclick="checkQuiz(this, false)">2.0 m</button>
+            <button onclick="checkQuiz(this, true)">1.0 m</button>
+            <button onclick="checkQuiz(this, false)">4.0 m</button>
+            <p id="quiz-feedback" style="margin-top:10px; color: var(--accent-orange); font-weight:bold;"></p>
+        </div>
     </div>
 
-    <div id="info">
-      <p>τ₁: <span id="tau1">0.00</span> N·m</p>
-      <p>τ₂: <span id="tau2">0.00</span> N·m</p>
-      <p>Δτ: <span id="delta">0.00</span> N·m</p>
-      <p><span id="state">狀態: 平衡</span></p>
+    <div id="experiment-card">
+        <div id="exp-header">
+            <div class="control-group double">
+                <div class="slider-wrapper">
+                    <span class="slider-label" style="color:var(--accent-blue)">左質量 m₁: <span id="m1Disp">2.0</span> kg</span>
+                    <input type="range" id="m1" min="0.5" max="10" step="0.5" value="2.0" oninput="syncInputs()">
+                </div>
+                <div class="slider-wrapper">
+                    <span class="slider-label" style="color:var(--accent-blue)">左距離 r₁: <span id="r1Disp">2.0</span> m</span>
+                    <input type="range" id="r1" min="0.5" max="8" step="0.5" value="2.0" oninput="syncInputs()">
+                </div>
+            </div>
+
+            <div class="control-group double">
+                <div class="slider-wrapper">
+                    <span class="slider-label" style="color:var(--accent-red)">右質量 m₂: <span id="m2Disp">1.0</span> kg</span>
+                    <input type="range" id="m2" min="0.5" max="10" step="0.5" value="1.0" oninput="syncInputs()">
+                </div>
+                <div class="slider-wrapper">
+                    <span class="slider-label" style="color:var(--accent-red)">右距離 r₂: <span id="r2Disp">4.0</span> m</span>
+                    <input type="range" id="r2" min="0.5" max="8" step="0.5" value="4.0" oninput="syncInputs()">
+                </div>
+            </div>
+
+            <div style="margin-left:auto; display:flex; gap:10px;">
+                <button class="btn-reset" onclick="resetSim()">重置</button>
+                <button class="btn-record" onclick="recordData()">紀錄數據</button>
+                <button onclick="openModal()" style="background: #333;">紀錄簿</button>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="success-toast">
+                <span class="checkmark">✔</span>
+                <div>數據已成功紀錄</div>
+            </div>
+
+            <div id="telemetry">
+                <span style="color:#adb5bd; font-size:11px;">實時力矩監測</span><br>
+                <span style="color:var(--accent-blue)">τ Left:</span> <span id="tau1Disp" style="color:white; font-weight:bold;">0.00</span> N·m<br>
+                <span style="color:var(--accent-red)">τ Right:</span> <span id="tau2Disp" style="color:white; font-weight:bold;">0.00</span> N·m<br>
+                <hr style="border-color:#555; margin:5px 0;">
+                Net Torque: <span id="netTauDisp" style="color:var(--accent-yellow);">0.00</span> N·m<br>
+                狀態: <span id="statusDisp" style="font-weight:bold;">計算中...</span>
+            </div>
+            
+            <canvas id="simCanvas"></canvas>
+            
+            <div style="position: absolute; bottom: 10px; left: 10px; color: #888; font-size: 12px;">
+                * 提示：可直接拖曳藍色與紅色方塊來移動位置
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <canvas id="canvas" width="800" height="400"></canvas>
-</section>
+</div>
+
+<div id="recordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="margin:0;">📔 實驗紀錄簿 (Equilibrium Logs)</h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button onclick="clearRecords()" style="background: var(--accent-red); padding: 5px 15px; font-size: 13px;">清除所有紀錄</button>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+        </div>
+        <table id="recordTable">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>左質量 m₁ (kg)</th>
+                    <th>左距離 r₁ (m)</th>
+                    <th>右質量 m₂ (kg)</th>
+                    <th>右距離 r₂ (m)</th>
+                    <th>淨力矩 (N·m)</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody id="recordBody"></tbody>
+        </table>
+    </div>
+</div>
 
 <script>
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-
-  const g = 9.8;
-  const pxPerMeter = 20;
-  const beamHalf = 300;
-  const angleScale = 0.35; 
-
-  let m1=2,r1=1.6,m2=1,r2=10;
-  let angle=0,targetAngle=0;
-  const maxAngle=Math.PI/10;
-
-  const m1Input=document.getElementById("m1");
-  const r1Input=document.getElementById("r1");
-  const m2Input=document.getElementById("m2");
-  const r2Input=document.getElementById("r2");
-  const tau1El=document.getElementById("tau1");
-  const tau2El=document.getElementById("tau2");
-  const deltaEl=document.getElementById("delta");
-  const stateEl=document.getElementById("state");
-
-  function clamp(v,min,max){
-    return Math.min(Math.max(v,min),max);
-  }
-
-  function drawBeam(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width/2,canvas.height/2+40);
-    ctx.rotate(angle);
-
-    // 畫桿
-    ctx.fillStyle="#34495e";
-    ctx.fillRect(-beamHalf,-10,beamHalf*2,20);
-
-    // 畫支點
-    ctx.beginPath();
-    ctx.arc(0,0,8,0,2*Math.PI);
-    ctx.fillStyle="#2c3e50";
-    ctx.fill();
-
-    // 畫左砝碼 (藍色)
-    let lx=clamp(-r1*pxPerMeter,-beamHalf+20,-20);
-    ctx.fillStyle="#3498db";
-    ctx.fillRect(lx-15,-40,30,30);
-    ctx.fillStyle="white";
-    ctx.font="12px Arial";
-    ctx.fillText("m1", lx-8, -20);
-
-    // 畫右砝碼 (紅色)
-    let rx=clamp(r2*pxPerMeter,20,beamHalf-20);
-    ctx.fillStyle="#e74c3c";
-    ctx.fillRect(rx-15,-40,30,30);
-    ctx.fillStyle="white";
-    ctx.fillText("m2", rx-8, -20);
-
-    ctx.restore();
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
     
-    // 畫支架三角形
-    ctx.beginPath();
-    ctx.moveTo(canvas.width/2, canvas.height/2+50);
-    ctx.lineTo(canvas.width/2-20, canvas.height/2+100);
-    ctx.lineTo(canvas.width/2+20, canvas.height/2+100);
-    ctx.closePath();
-    ctx.fillStyle="#7f8c8d";
-    ctx.fill();
-  }
+    // 物理變數
+    let m1 = 2.0, r1 = 2.0;
+    let m2 = 1.0, r2 = 4.0;
+    const g = 9.8; 
+    let angle = 0;
+    let targetAngle = 0;
+    const maxAngle = Math.PI / 8; 
+    
+    // 繪圖變數
+    let scale = 50; 
+    let originX, originY;
+    let beamLength = 16; 
+    
+    // 互動變數
+    let isDraggingM1 = false;
+    let isDraggingM2 = false;
 
-  function apply(){
-    m1=+m1Input.value;
-    r1=+r1Input.value;
-    m2=+m2Input.value;
-    r2=+r2Input.value;
+    // 紀錄數據
+    let records = [];
 
-    let tau1=m1*g*r1;
-    let tau2=m2*g*r2;
-    let delta=tau1-tau2;
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        originX = canvas.width / 2;
+        originY = canvas.height / 2 + 50;
+        draw();
+    }
 
-    tau1El.textContent=tau1.toFixed(2);
-    tau2El.textContent=tau2.toFixed(2);
-    deltaEl.textContent=delta.toFixed(2);
-    stateEl.textContent=Math.abs(delta)<1?"狀態: 平衡":"狀態: 不平衡";
+    function syncInputs() {
+        m1 = parseFloat(document.getElementById('m1').value);
+        r1 = parseFloat(document.getElementById('r1').value);
+        m2 = parseFloat(document.getElementById('m2').value);
+        r2 = parseFloat(document.getElementById('r2').value);
 
-    let norm=delta/(Math.abs(tau1)+Math.abs(tau2) + 0.1);
-    targetAngle=clamp(-norm*maxAngle*angleScale,-maxAngle,maxAngle);
-  }
+        // 更新文字顯示
+        document.getElementById('m1Disp').innerText = m1.toFixed(1);
+        document.getElementById('r1Disp').innerText = r1.toFixed(1);
+        document.getElementById('m2Disp').innerText = m2.toFixed(1);
+        document.getElementById('r2Disp').innerText = r2.toFixed(1);
+    }
 
-  function animate(){
-    angle+=(targetAngle-angle)*0.05;
-    drawBeam();
-    requestAnimationFrame(animate);
-  }
+    function calculate() {
+        let tau1 = m1 * g * r1;
+        let tau2 = m2 * g * r2;
+        let netTau = tau1 - tau2; 
+        
+        document.getElementById('tau1Disp').innerText = tau1.toFixed(2);
+        document.getElementById('tau2Disp').innerText = tau2.toFixed(2);
+        document.getElementById('netTauDisp').innerText = (tau1 - tau2).toFixed(2);
+        
+        const statusEl = document.getElementById('statusDisp');
+        if (Math.abs(tau1 - tau2) < 0.01) {
+            statusEl.innerText = "BALANCED (平衡)";
+            statusEl.style.color = "#51cf66"; 
+            targetAngle = 0;
+        } else {
+            statusEl.innerText = "UNBALANCED (不平衡)";
+            statusEl.style.color = "#fa5252"; 
+            let tilt = (tau1 - tau2) / (Math.max(tau1, tau2) + 1); 
+            targetAngle = -tilt * maxAngle; 
+            targetAngle = Math.max(-maxAngle, Math.min(maxAngle, targetAngle));
+        }
+    }
 
-  apply();
-  animate();
+    function animate() {
+        let diff = targetAngle - angle;
+        angle += diff * 0.1;
+        draw();
+        calculate();
+        requestAnimationFrame(animate);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        drawGrid();
+
+        ctx.save();
+        ctx.translate(originX, originY);
+        
+        // 畫支架
+        ctx.fillStyle = "#7f8c8d";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-25, 50);
+        ctx.lineTo(25, 50);
+        ctx.fill();
+
+        // 旋轉
+        ctx.rotate(angle);
+
+        // 畫橫桿
+        ctx.fillStyle = "#34495e";
+        let halfLenPx = (beamLength / 2) * scale;
+        ctx.fillRect(-halfLenPx, -8, halfLenPx * 2, 16);
+        
+        // 畫刻度
+        ctx.fillStyle = "#ecf0f1";
+        for (let i = 1; i <= beamLength/2; i++) {
+            ctx.fillRect(-i * scale, -2, 2, 4);
+            ctx.fillRect(i * scale, -2, 2, 4);
+        }
+
+        // 畫左砝碼
+        let x1 = -r1 * scale;
+        let s1 = 25 + m1 * 2; 
+        ctx.fillStyle = "#339af0";
+        ctx.fillRect(x1 - s1/2, -8 - s1, s1, s1);
+        ctx.fillStyle = "white";
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("m1", x1, -12 - s1/2);
+        
+        // 畫右砝碼
+        let x2 = r2 * scale;
+        let s2 = 25 + m2 * 2;
+        ctx.fillStyle = "#fa5252";
+        ctx.fillRect(x2 - s2/2, -8 - s2, s2, s2);
+        ctx.fillStyle = "white";
+        ctx.fillText("m2", x2, -12 - s2/2);
+
+        // 支點
+        ctx.beginPath();
+        ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "#bdc3c7";
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function drawGrid() {
+        ctx.strokeStyle = "rgba(255,255,255,0.05)";
+        ctx.lineWidth = 1;
+        const gridSize = scale; 
+        for(let x = originX % gridSize; x < canvas.width; x += gridSize) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for(let y = originY % gridSize; y < canvas.height; y += gridSize) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+    }
+
+    // 互動邏輯 (精確判定版)
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const dx = mouseX - originX;
+        const dy = mouseY - originY;
+
+        // 逆向旋轉矩陣
+        const cosA = Math.cos(-angle);
+        const sinA = Math.sin(-angle);
+        
+        const beamX = dx * cosA - dy * sinA;
+        const beamY = dx * sinA + dy * cosA;
+
+        if (Math.abs(beamY + 40) > 80) return; 
+
+        const m1Pos = -r1 * scale;
+        const m2Pos = r2 * scale;
+        const hitRadius = 40; 
+
+        if (Math.abs(beamX - m1Pos) < hitRadius) {
+            isDraggingM1 = true;
+            canvas.style.cursor = "grabbing";
+        } else if (Math.abs(beamX - m2Pos) < hitRadius) {
+            isDraggingM2 = true;
+            canvas.style.cursor = "grabbing";
+        }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDraggingM1 && !isDraggingM2) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const dx = mouseX - originX;
+        const dy = mouseY - originY;
+        const cosA = Math.cos(-angle);
+        const sinA = Math.sin(-angle);
+        const beamX = dx * cosA - dy * sinA; 
+
+        let dist = beamX / scale;
+        
+        if (isDraggingM1) {
+            let newR = -dist;
+            newR = Math.max(0.5, Math.min(8, newR)); 
+            document.getElementById('r1').value = newR;
+        } else if (isDraggingM2) {
+            let newR = dist;
+            newR = Math.max(0.5, Math.min(8, newR));
+            document.getElementById('r2').value = newR;
+        }
+        syncInputs();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDraggingM1 = false;
+        isDraggingM2 = false;
+        canvas.style.cursor = "grab";
+    });
+
+    function resetSim() {
+        document.getElementById('m1').value = 2.0;
+        document.getElementById('r1').value = 2.0;
+        document.getElementById('m2').value = 1.0;
+        document.getElementById('r2').value = 4.0;
+        syncInputs();
+    }
+
+    function recordData() {
+        let net = (m1*g*r1) - (m2*g*r2);
+        let status = Math.abs(net) < 0.01 ? "平衡" : "不平衡";
+        let color = Math.abs(net) < 0.01 ? "green" : "red";
+        
+        records.push({
+            time: new Date().toLocaleTimeString(), m1: m1.toFixed(1), r1: r1.toFixed(1), m2: m2.toFixed(1), r2: r2.toFixed(1), net: net.toFixed(2), status, color
+        });
+        
+        const toast = document.getElementById('success-toast');
+        toast.style.display = 'block';
+        toast.style.animation = 'none';
+        toast.offsetHeight; 
+        toast.style.animation = 'fadeInOut 1.5s ease-in-out';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 1500);
+    }
+
+    function openModal() {
+        const tbody = document.getElementById('recordBody');
+        tbody.innerHTML = records.map(r => `
+            <tr>
+                <td>${r.time}</td>
+                <td>${r.m1}</td>
+                <td>${r.r1}</td>
+                <td>${r.m2}</td>
+                <td>${r.r2}</td>
+                <td>${r.net}</td>
+                <td style="color:${r.color}; font-weight:bold;">${r.status}</td>
+            </tr>
+        `).join('');
+        document.getElementById('recordModal').style.display = "block";
+    }
+    
+    function closeModal() {
+        document.getElementById('recordModal').style.display = "none";
+    }
+
+    function clearRecords() {
+        if(confirm("確定清空？")) {
+            records = [];
+            openModal();
+        }
+    }
+    
+    function checkQuiz(btn, isCorrect) {
+        const feedback = document.getElementById('quiz-feedback');
+        if(isCorrect) {
+            feedback.innerText = "✅ 正確！力矩相等：2*2 = 4*1";
+            feedback.style.color = "var(--accent-green)";
+            btn.style.background = "var(--accent-green)";
+        } else {
+            feedback.innerText = "❌ 錯誤，請計算力矩 τ = r × F";
+            feedback.style.color = "var(--accent-red)";
+            btn.style.background = "var(--accent-red)";
+        }
+    }
+
+    window.addEventListener('resize', resize);
+    window.onclick = function(e) { if(e.target == document.getElementById('recordModal')) closeModal(); };
+    resize();
+    syncInputs();
+    animate();
+
 </script>
 </body>
 </html>

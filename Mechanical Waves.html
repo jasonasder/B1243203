@@ -1,288 +1,421 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>機械波（Mechanical Waves）</title>
+    <meta charset="utf-8" />
+    <title>物理實驗室 - 機械波專業交互版 (全參數鎖定版)</title>
+    <style>
+        :root {
+            --nav-bg: #2c3e50;
+            --theory-bg: rgba(255, 255, 255, 0.98);
+            --lab-bg: #2b323a;
+            --accent-green: #51cf66; 
+            --accent-blue: #339af0;
+            --accent-orange: #ff922b;
+            --accent-yellow: #fcc419; 
+            --text-main: #343a40;
+        }
+        
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: url('img/bb.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-<style>
-  body { 
-    font-family:"Microsoft JhengHei",sans-serif; 
-    margin:0; padding:0; 
-    background: url('img/bb.webp') no-repeat center center fixed; 
-    background-size: cover;
-    color:#333; 
-    line-height:1.8; 
-  }
+        nav {
+            height: 60px; background: var(--nav-bg);
+            display: flex; align-items: center; padding: 0 30px; z-index: 100;
+        }
+        nav a { color: #dee2e6; text-decoration: none; margin-right: 25px; font-weight: bold; font-size: 15px; }
+        nav a.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); }
 
-  nav {
-    background: rgba(44, 62, 80);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  nav .menu a {
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-  nav .menu a:hover { color: #f1c40f; }
+        #main-container {
+            flex-grow: 1; display: flex; padding: 15px; gap: 15px;
+            height: calc(100vh - 60px);
+        }
 
-  header { 
-    background: rgba(52, 73, 94, 0.85); 
-    color:white; 
-    text-align:center; 
-    padding:10px 10px; 
-  }
-  h1 { margin:0; font-size:50px; }
+        #theory-card {
+            width: 400px; background: var(--theory-bg);
+            border-radius: 12px; padding: 20px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        h1 { font-size: 40px; color: var(--text-main); margin: 0; border-bottom: 3px solid var(--accent-green); padding-bottom: 5px; }
+        h2 { font-size: 20px; color: #1a5276; margin-top: 20px; border-left: 5px solid #1a5276; padding-left: 10px; }
+        p { color: #444; line-height: 1.6; font-size: 16px; text-align: justify; }
+        .formula-box { background: #f8f9fa; padding: 10px; border-radius: 6px; font-size: 14px; border: 1px solid #e9ecef; margin-top: 5px; }
 
-  section { 
-    max-width:900px; 
-    margin:25px auto; 
-    background: rgba(255, 255, 255, 0.92); 
-    border-radius:12px; 
-    box-shadow:0 8px 32px rgba(0,0,0,0.2); 
-    padding:30px 40px; 
-  }
+        #experiment-card {
+            flex-grow: 1; background: var(--theory-bg);
+            border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
 
-  h2 { 
-    color:#1a5276; 
-    border-left:6px solid #1a5276; 
-    padding-left:15px; 
-    margin-top:20px; 
-    font-size:35px;
-  }
-  p { font-size:20px; text-align:justify; }
+        #exp-header {
+            padding: 12px 20px; background: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+        }
+        .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-size: 13px; font-weight: bold; }
+        .val-tag { color: var(--accent-blue); }
+        input[type="range"] { width: 110px; cursor: pointer; }
+        
+        button { 
+            background: var(--accent-green); color: white; border: none; padding: 8px 18px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;
+        }
+        button:hover { background: #40c057; }
 
-  .formula-box {
-    background: rgba(26, 82, 118, 0.05);
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #1a5276;
-    margin: 15px 0;
-  }
-
-  .control-panel {
-    background: #fdfefe;
-    border: 1px solid #d5dbdb;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .control { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 15px; 
-  }
-  .control-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  label { font-size: 22px; font-weight: bold; }
-  input { font-size:18px; padding:6px; width: 80px; border-radius:4px; border:1px solid #ccc; }
-  
-  button { 
-    background:#1a5276; 
-    color:#fff; 
-    border:none; 
-    border-radius:5px; 
-    cursor:pointer; 
-    padding: 8px 25px;
-    font-size: 18px;
-    transition: 0.3s;
-  }
-  button:hover { background:#2471a3; transform: scale(1.05); }
-
-  #info { 
-    display:flex; 
-    justify-content:center; 
-    border-top: 1px solid #eee;
-
-  }
-  #info p { font-size: 25px; font-weight: bold; color: #d35400; }
-
-  canvas { 
-    display:block; 
-    margin:20px auto; 
-    border:2px solid #333; 
-    background:#fff; 
-    border-radius: 5px;
-  }
-</style>
+        #canvas-container {
+            flex-grow: 1; position: relative;
+            background: var(--lab-bg); margin: 10px;
+            border-radius: 8px; border: 1px solid #454d55; overflow: hidden;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+        #telemetry {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(33, 37, 41, 0.85); color: #fcc419;
+            padding: 10px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 14px; border-left: 4px solid var(--accent-green);
+            pointer-events: none;
+        }
+        #quiz-feedback { margin-top: 10px; padding: 10px; border-radius: 6px; font-weight: bold; display: none; font-size: 13px; }
+    </style>
 </head>
-
 <body>
 
 <nav>
-  <div class="menu">
-    <a href="index.html">首頁 (Home)</a>
-    <a href="Equilibrium & Elasticity.html">平衡與彈性</a>
-    <a href="Mechanical Waves.html" style="color:#f1c40f">機械波</a>
-    <a href="Projectile Motion.html">拋體運動</a>
-    <a href="Rotation of Rigid Bodies.html">圓周旋轉</a>
-    <a href="Sound & Hearing.html">聲音聽覺</a>
-  </div>
+    <a href="index.html">Home</a>
+    <a href="Projectile Motion.html" >Projectile Motion</a>
+    <a href="Mechanical Waves.html" class="active">Mechanical Waves</a>
+    <a href="Rotation of Rigid Bodies.html">Rotation of Rigid Bodies</a>
+    <a href="Equilibrium & Elasticity.html" >Equilibrium & Elasticity</a>
+    <a href="Sound & Hearing.html">Sound & Hearing</a>
 </nav>
 
-<header>
-  <h1>機械波（Mechanical Waves）</h1>
-</header>
+<div id="main-container">
+    <div id="theory-card">
+        <h1>機械波</h1>
+        <h2>定律內容</h2>
+        <p>機械波是能量在介質中傳遞的現象。產生條件包含波源的擾動與彈性介質。<b>核心本質：介質質點僅在平衡位置附近振動，不會隨波遷移。</b></p>
+        
+        <h2>公式表示</h2>
+        <div class="formula-box">
+            <b>波速：</b> v = f · λ = λ / T <br>
+            <b>方程：</b> y(x,t) = A sin(2π(x/λ - ft)) <br>
+            <b>頻率：</b> f = 1 / T
+        </div>
 
-<section>
-  <h2>定律內容</h2>
-  <p>機械波是介質中粒子的週期性振動所形成的能量傳遞現象，粒子僅在平衡位置附近振動，能量隨波動向前傳播。</p>
+        <h2>圖像理解</h2>
+        <p>波形呈現規律的週期曲線。請觀察<b>綠色質點</b>，無論波峰如何右移，質點永遠只在固定的垂直線上運動。這證明波傳遞的是能量而非物質。</p>
 
-  <h2>公式表示</h2>
-  <div class="formula-box">
-    波速：v = f · λ<br>
-    波動方程（簡諧波）：y(x,t) = A sin(2π(x/λ − ft))
-  </div>
+        <h2>適用範圍</h2>
+        <p>適用於理想均勻之彈性介質，模擬線性簡諧波，不考慮能量耗散與阻尼效應。</p>
 
-  
+        <h2>實驗探究任務</h2>
+        <div class="formula-box" style="border-left: 4px solid var(--accent-blue);">
+            1. <b>傳導觀察：</b>按下開始，觀察波如何由左至右「生成」而非整條跳動。<br>
+            2. <b>質點位置：</b>抓取右下角綠球，放在波峰處，觀察其是否隨波起伏。
+        </div>
 
-  <h2>圖像理解</h2>
-  <p>圖中顯示的是沿 x 方向傳播的橫波。振幅 A 影響位移大小，頻率 f 影響振動快慢，波長 λ 則決定空間中波峰之間的距離。</p>
-
-  <h2>適用範圍</h2>
-  <p>本定律適用於需要介質傳播的機械波。分析對象通常假設介質為連續、均勻且各向同性。本模型適合用於低能量、線性簡諧波情境，不考慮能量耗散或非線性效應。</p>
-
-  <h2>常見應用</h2>
-  <p>聲波傳播、地震波、繩波實驗、水面波與工程振動分析等。</p>
-</section>
-
-<section>
-  <h2>實驗模擬：機械波傳播</h2>
-
-  <div class="control-panel">
-    <div class="control">
-      <div class="control-row">
-        <label>振幅 A (m)：<input id="A" type="number" value="2" step="0.1"></label>
-        <label>波長 λ (m)：<input id="lambda" type="number" value="4" step="0.5"></label>
-      </div>
-      <div class="control-row">
-        <label>頻率 f (Hz)：<input id="f" type="number" value="1" step="0.1"></label>
-        <button id="startBtn" onclick="toggleSimulation()">開始</button>
-        <button onclick="reset()" style="background:#7f8c8d;">重設</button>
-      </div>
+        <h2>隨堂測驗</h2>
+        <div style="background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+            <p style="margin:0 0 10px 0; font-size: 14px;"><b>Q: 機械波由左向右傳，質點正處於平衡位置向上移動，下一瞬間？</b></p>
+            <button onclick="showFeedback(true, '正確！質點會繼續往振幅最大處（波峰）移動。')" style="font-size:12px; padding:5px 10px; background:#666; color:white; border:none; border-radius:4px; cursor:pointer;">繼續上升</button>
+            <button onclick="showFeedback(false, '不對喔，質點只會垂直振動，不會水平位移！')" style="font-size:12px; padding:5px 10px; background:#666; color:white; border:none; border-radius:4px; cursor:pointer;">向右移動</button>
+            <div id="quiz-feedback"></div>
+        </div>
     </div>
 
-    <div id="info">
-      <p id="speed">波速 v = 4.00 m/s</p>
-    </div>
-  </div>
+    <div id="experiment-card">
+        <div id="exp-header">
+            <div class="control-group">
+                <span>運行模式</span>
+                <select id="mode" onchange="switchMode()" style="font-size: 12px; padding: 2px;">
+                    <option value="auto">自動震盪</option>
+                    <option value="manual">手動撥動 (PhET模式)</option>
+                </select>
+            </div>
+            
+            <div id="auto-params" style="display: flex; gap: 15px;">
+                <div class="control-group">
+                    <span>振幅 A: <span class="val-tag" id="aV">2.0</span> m</span>
+                    <input type="range" id="amp" min="0.5" max="3.5" step="0.1" value="2" oninput="updateParams()">
+                </div>
+                <div class="control-group">
+                    <span>頻率 f: <span class="val-tag" id="fV">1.0</span> Hz</span>
+                    <input type="range" id="freq" min="0.2" max="2.5" step="0.1" value="1" oninput="updateParams()">
+                </div>
+            </div>
 
-  <canvas id="canvas" width="800" height="420"></canvas>
-</section>
+            <div class="control-group" id="lamb-group">
+                <span>波長 λ: <span class="val-tag" id="lV">4.0</span> m</span>
+                <input type="range" id="lamb" min="2" max="10" step="0.1" value="4" oninput="updateParams()">
+            </div>
+            
+            <div class="control-group">
+                <span>觀察速度</span>
+                <select id="speedCtrl" style="font-size:12px; padding: 2px;">
+                    <option value="1">正常速度 (1.0x)</option>
+                    <option value="0.2">慢動作 (0.2x)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-left: 10px;">
+                <button id="playBtn" onclick="togglePlay()">開始模擬</button>
+                <button onclick="resetWave()" style="background:#adb5bd;">重設波形</button>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="telemetry">
+                波速 v = <span id="vDisp">4.00</span> m/s<br>
+                週期 T = <span id="tDisp">1.00</span> s
+            </div>
+            <canvas id="simCanvas"></canvas>
+        </div>
+    </div>
+</div>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
 
-let A = 2, lambda = 4, f = 1;
-let t = 0;
-let isRunning = false;
-let animationId;
+    let A = 2, f = 1, lambda = 4, t = 0;
+    let isRunning = false; 
+    let mode = 'auto';
+    let waveData = []; 
+    let scale = 60, offsetX = 100;
 
-const pxPerMeterX = 80;
-const pxPerMeterY = 80;
+    let isDraggingSource = false;
+    let isDraggingTracer = false;
+    let manualY = 0; // 手動模式下的當前高度
+    let tracer = { x: -1, y: 0, isPlaced: false }; 
+    let stepCounter = 0;
+    
+    let lastTime = 0; 
 
-function drawAxes(){
-  const ox = 100;
-  const oy = canvas.height / 2;
-  ctx.strokeStyle = "#aaa";
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(canvas.width - 20, oy); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(ox, 20); ctx.lineTo(ox, canvas.height - 20); ctx.stroke();
-  ctx.font = "14px Microsoft JhengHei";
-  ctx.fillStyle = "#333";
-  [2,1,0,-1,-2].forEach(v=>{
-    const y = oy - v * pxPerMeterY;
-    ctx.beginPath(); ctx.moveTo(ox-6,y); ctx.lineTo(ox+6,y); ctx.stroke();
-    ctx.fillText(v, ox-30, y+4);
-  });
-  ctx.fillText("y (m)", 20, 30);
-  for(let x=2;x<=8;x+=2){
-    const px = ox + x * pxPerMeterX;
-    ctx.beginPath(); ctx.moveTo(px, oy-6); ctx.lineTo(px, oy+6); ctx.stroke();
-    ctx.fillText(x, px-6, oy+20);
-  }
-  ctx.fillText("x (m)", canvas.width-60, oy+40);
-}
+    function resize() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      const requiredPoints = Math.ceil(canvas.width / (0.05 * 50)) + 50; 
+      if (waveData.length < requiredPoints) {
+          waveData = new Array(requiredPoints).fill(0);
+      }
+      updateParams();
+    }
 
-function drawWave(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawAxes();
-  const ox = 100;
-  const oy = canvas.height/2;
-  ctx.strokeStyle="#1c7ed6";
-  ctx.lineWidth=3;
-  ctx.beginPath();
-  for(let x=0;x<=8;x+=0.02){
-    const y = A * Math.sin(2*Math.PI*(x/lambda - f*t));
-    const cx = ox + x * pxPerMeterX;
-    const cy = oy - y * pxPerMeterY;
-    if(x===0) ctx.moveTo(cx,cy);
-    else ctx.lineTo(cx,cy);
-  }
-  ctx.stroke();
-}
+    // ★★★ 核心修改：切換模式時同時鎖定波長選項 ★★★
+    function switchMode() {
+        mode = document.getElementById('mode').value;
+        const autoParams = document.getElementById('auto-params');
+        const lambGroup = document.getElementById('lamb-group');
 
-function toggleSimulation() {
-  const btn = document.getElementById("startBtn");
-  isRunning = !isRunning;
-  if (isRunning) {
-    apply();
-    btn.textContent = "暫停";
-    btn.style.background = "#d35400";
-    animate();
-  } else {
-    btn.textContent = "開始";
-    btn.style.background = "#1a5276";
-    cancelAnimationFrame(animationId);
-  }
-}
+        if (mode === 'auto') {
+            // 自動模式：全部啟用
+            autoParams.style.opacity = "1";
+            autoParams.style.pointerEvents = "auto";
+            lambGroup.style.opacity = "1";
+            lambGroup.style.pointerEvents = "auto";
+        } else {
+            // 手動模式：全部變灰、禁用
+            autoParams.style.opacity = "0.3";
+            autoParams.style.pointerEvents = "none";
+            lambGroup.style.opacity = "0.3";
+            lambGroup.style.pointerEvents = "none";
+            
+            // 切換到手動時，預設暫停自動波，但允許模擬運行
+            isRunning = true; 
+            document.getElementById('playBtn').innerText = "暫停";
+        }
+        resetWave(); 
+    }
 
-function apply(){
-  A = parseFloat(document.getElementById("A").value);
-  lambda = parseFloat(document.getElementById("lambda").value);
-  f = parseFloat(document.getElementById("f").value);
-  document.getElementById("speed").textContent = `波速 v = ${(f * lambda).toFixed(2)} m/s`;
-  if(!isRunning) drawWave();
-}
+    function resetWave() {
+        waveData.fill(0);
+        t = 0;
+        manualY = 0; 
+        stepCounter = 0;
+        if(mode === 'auto') {
+            isRunning = false;
+            document.getElementById('playBtn').innerText = "開始模擬";
+        }
+        tracer.isPlaced = false;
+        tracer.x = -1;
+        draw(performance.now()); 
+    }
 
-function reset(){
-  isRunning = false;
-  t = 0;
-  cancelAnimationFrame(animationId);
-  document.getElementById("A").value = 2;
-  document.getElementById("lambda").value = 4;
-  document.getElementById("f").value = 1;
-  const btn = document.getElementById("startBtn");
-  btn.textContent = "開始";
-  btn.style.background = "#1a5276";
-  apply();
-  drawWave();
-}
+    function togglePlay() {
+        isRunning = !isRunning;
+        document.getElementById('playBtn').innerText = isRunning ? "暫停" : "開始模擬";
+        if(isRunning) lastTime = performance.now(); 
+    }
 
-function animate(){
-  if (!isRunning) return;
-  t += 0.015;
-  drawWave();
-  animationId = requestAnimationFrame(animate);
-}
+    function updateParams() {
+        A = parseFloat(document.getElementById('amp').value);
+        f = parseFloat(document.getElementById('freq').value);
+        lambda = parseFloat(document.getElementById('lamb').value);
+        document.getElementById('aV').innerText = A.toFixed(1);
+        document.getElementById('fV').innerText = f.toFixed(1);
+        document.getElementById('lV').innerText = lambda.toFixed(1);
+        document.getElementById('vDisp').innerText = (f * lambda).toFixed(2);
+        document.getElementById('tDisp').innerText = (1 / f).toFixed(2);
+    }
 
-apply();
-drawWave();
+    function showFeedback(isCorrect, text) {
+        const div = document.getElementById('quiz-feedback');
+        div.style.display = "block";
+        div.style.background = isCorrect ? "rgba(81, 207, 102, 0.2)" : "rgba(250, 82, 82, 0.2)";
+        div.style.color = isCorrect ? "#2b8a3e" : "#c92a2a";
+        div.innerText = (isCorrect ? "✅ " : "❌ ") + text;
+    }
+
+    // --- 滑鼠事件監聽 ---
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mX = e.clientX - rect.left;
+        const mY = e.clientY - rect.top;
+        const cy = canvas.height / 2;
+
+        let tx = tracer.isPlaced ? offsetX + tracer.x * scale : canvas.width - 50;
+        let ty = tracer.isPlaced ? cy - tracer.y * scale : canvas.height - 50;
+        if (Math.sqrt((mX - tx)**2 + (mY - ty)**2) < 30) {
+            isDraggingTracer = true;
+            canvas.style.cursor = 'grabbing';
+            return;
+        }
+
+        if (Math.abs(mX - offsetX) < 40) {
+            isDraggingSource = true;
+            canvas.style.cursor = 'ns-resize';
+            if(mode === 'manual' && !isRunning) togglePlay();
+        }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mX = e.clientX - rect.left;
+        const mY = e.clientY - rect.top;
+        const cy = canvas.height / 2;
+
+        if (isDraggingTracer) {
+            tracer.x = (mX - offsetX) / scale;
+            tracer.isPlaced = (tracer.x > 0);
+        } else if (isDraggingSource) {
+            const limit = canvas.height / 2 - 40;
+            const clampedY = Math.max(cy - limit, Math.min(cy + limit, mY));
+            manualY = (cy - clampedY) / scale; 
+        }
+    });
+
+    window.addEventListener('mouseup', () => { 
+        isDraggingSource = false; 
+        isDraggingTracer = false; 
+        canvas.style.cursor = 'default';
+        if (tracer.x < 0) tracer.isPlaced = false; 
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        scale = Math.min(Math.max(50, scale + (e.deltaY > 0 ? -5 : 5)), 200);
+    }, {passive: false});
+
+    function drawAxes() {
+        const cy = canvas.height / 2;
+        ctx.strokeStyle = "#777"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(offsetX, 0); ctx.lineTo(offsetX, canvas.height); ctx.stroke();
+        
+        ctx.fillStyle = "#aaa"; ctx.font = "bold 12px Arial";
+        for(let i = -4; i <= 4; i++) {
+            if(i === 0) continue;
+            ctx.fillText(i + "m", offsetX - 35, cy - i * scale + 5);
+            ctx.beginPath(); ctx.moveTo(offsetX - 5, cy - i * scale); ctx.lineTo(offsetX + 5, cy - i * scale); ctx.stroke();
+        }
+        for(let j = 2; j <= 20; j += 2) {
+            ctx.fillText(j + "m", offsetX + j * scale - 10, cy + 25);
+            ctx.beginPath(); ctx.moveTo(offsetX + j * scale, cy - 5); ctx.lineTo(offsetX + j * scale, cy + 5); ctx.stroke();
+        }
+    }
+
+    function draw(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const rawDt = (timestamp - lastTime) / 1000; 
+        lastTime = timestamp;
+        const dt = Math.min(rawDt, 0.1) * parseFloat(document.getElementById('speedCtrl').value);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cy = canvas.height / 2;
+        drawAxes();
+
+        const v = (mode === 'auto') ? (f * lambda) : 5.0; 
+        const dx = 0.05; 
+
+        if (isRunning) {
+            if (mode === 'auto') t += dt;
+
+            stepCounter += v * dt;
+            while (stepCounter >= dx) { 
+                let nextY;
+                if (mode === 'auto') {
+                    nextY = A * Math.sin(-2 * Math.PI * f * t);
+                } else {
+                    nextY = manualY;
+                }
+                waveData.unshift(nextY);
+                waveData.pop(); 
+                stepCounter -= dx; 
+            }
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = (mode === 'auto') ? "#339af0" : "#adb5bd";
+        ctx.lineWidth = 4;
+        
+        for (let i = 0; i < waveData.length; i++) {
+            const px = offsetX + i * (dx * scale); 
+            const py = cy - waveData[i] * scale;
+            
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+            
+            if (tracer.isPlaced && Math.abs((px - offsetX) / scale - tracer.x) < (dx/2)) {
+                tracer.y = waveData[i];
+            }
+        }
+        ctx.stroke();
+
+        const currentSourceY = (mode === 'auto') ? waveData[0] : manualY;
+        
+        ctx.fillStyle = "#fa5252";
+        ctx.shadowBlur = 10; ctx.shadowColor = "#fa5252";
+        ctx.beginPath(); ctx.arc(offsetX, cy - currentSourceY * scale, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        if (tracer.isPlaced) {
+            ctx.fillStyle = "#51cf66";
+            ctx.shadowBlur = 10; ctx.shadowColor = "#51cf66";
+            ctx.beginPath(); ctx.arc(offsetX + tracer.x * scale, cy - tracer.y * scale, 10, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            ctx.fillStyle = "#fff";
+            ctx.font = "12px Consolas";
+            ctx.fillText(`y: ${tracer.y.toFixed(2)}m`, offsetX + tracer.x * scale + 15, cy - tracer.y * scale);
+        } else {
+            ctx.fillStyle = "rgba(81, 207, 102, 0.4)";
+            ctx.beginPath(); ctx.arc(canvas.width - 50, canvas.height - 50, 15, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.font = "bold 12px Arial";
+            ctx.fillText("拖放質點", canvas.width - 75, canvas.height - 75);
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    switchMode();
+    requestAnimationFrame(draw); 
 </script>
 
 </body>
